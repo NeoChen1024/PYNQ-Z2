@@ -61,11 +61,29 @@ Read these points before you use the board:
 | `tools/schematic_pins.py`, `tools/schematic-pins.csv` | Read the pins and nets of the FPGA from the schematic PDF |
 | `tools/tables.py` | Makes `pins.csv` and `pynq_z2_master.xdc`, and prints where the sources differ |
 | `tools/package-dump.tcl` | Writes the package data of the XC7Z020 CLG400 from Vivado |
+| `ps7/` | Exports the PS7 configuration of the board preset: `ps7_init_gpl.c` for U-Boot SPL, `ps7_init.tcl` for a JTAG boot, and the XSA |
+| `jtag/load.sh`, `jtag/load.tcl` | Load a bitstream into the PL over the USB-JTAG. They do not touch the flash or a card |
+| `jtag/boot.sh`, `jtag/boot.tcl` | Boot the PS over JTAG with `xsdb`: `ps7_init`, an optional bitstream, data files and an ELF program |
+| `examples/pl-blinky/` | The smallest PL design: SYSCLK, the switches, the buttons and the LEDs |
+| `linux/` | U-Boot, Linux 6.18 and Alpine Linux on F2FS: see [linux/README.md](linux/README.md) |
 | `board-files/` | The Vivado board files, a copy of XilinxBoardStore: see [board-files/README.md](board-files/README.md) |
 | `references/` | The schematic, the manual, the TUL XDC and PS7 preset, AMD documents and the Zynq Book: see [references/README.md](references/README.md) |
 
 The scripts do not write into the repository unless you name it as their output. The start of each
 script gives its usage.
+
+## Quick start
+
+```sh
+export VIVADO=/path/to/Xilinx/2025.2.1/Vivado/bin/vivado
+P=/path/to/this/repository
+
+cd /some/writable/directory
+sh $P/examples/pl-blinky/build.sh                       # into ./pynq-blinky
+sh $P/jtag/load.sh pynq-blinky/build/blinky.bit         # loads the PL; no flash or card is touched
+```
+
+Vivado needs the Zynq-7000 devices. These steps have not run on a board yet.
 
 ## License
 

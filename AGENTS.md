@@ -117,7 +117,8 @@ copy pins, figures or limits into this guide.
   negative.
 - The Python scripts use the standard library and pyserial. `tools/schematic_pins.py` also needs
   `pdftotext` of poppler. A new dependency needs a reason.
-- The Linux work uses U-Boot, a mainline kernel and Alpine Linux (armv7). Files that are copied to
+- The Linux work uses U-Boot SPL and U-Boot, a mainline kernel and Alpine Linux (armv7) on F2FS
+  (`linux/README.md`). U-Boot never keeps its environment in the QSPI flash. Files that are copied to
   the root file system get explicit modes and owners (`install -m`, `--owner=0 --group=0`): the
   host umask must not reach the card.
 - Run a job that uses much CPU time at the lowest priority (`nice -n 19`). The build scripts do this

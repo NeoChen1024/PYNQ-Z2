@@ -4,3 +4,9 @@ __pycache__/
 .Xil/
 *.jou
 *.log
+/pynq-blinky/
+/pynq-ps7/
+/pynq-uboot/
+/pynq-linux/
+/pynq-rootfs/
+/pynq-disk/

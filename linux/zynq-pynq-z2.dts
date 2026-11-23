@@ -1,0 +1,148 @@
+// SPDX-License-Identifier: MIT
+/*
+ * TUL PYNQ-Z2 (XC7Z020-1CLG400C). The PS peripherals of the board preset (docs/ps.md): UART0 on
+ * MIO14/15, GEM0 with the RTL8211E-VL, SDIO0, USB0 (host) with the TUSB1210, QSPI with the
+ * S25FL128S, and the HDMI output DDC on MIO50/51. The PL peripherals need a PL design and are not here.
+ * linux/build-kernel.sh copies this file to arch/arm/boot/dts/xilinx/ of the kernel and U-Boot trees.
+ */
+/dts-v1/;
+#include "zynq-7000.dtsi"
+#include <dt-bindings/gpio/gpio.h>
+
+/ {
+	model = "TUL PYNQ-Z2";
+	compatible = "tul,pynq-z2", "xlnx,zynq-7000";
+
+	aliases {
+		ethernet0 = &gem0;
+		i2c0 = &hdmi_tx_ddc;
+		mmc0 = &sdhci0;
+		serial0 = &uart0;
+		spi0 = &qspi;
+	};
+
+	chosen {
+		stdout-path = "serial0:115200n8";
+	};
+
+	/* 512 MiB of DDR3 on 16 bits (docs/ps.md). */
+	memory@0 {
+		device_type = "memory";
+		reg = <0x0 0x20000000>;
+	};
+
+	/* The ULPI PHY U9; MIO46 is its RESETB (docs/usb.md). */
+	usb_phy0: phy0 {
+		compatible = "usb-nop-xceiv";
+		#phy-cells = <0>;
+		reset-gpios = <&gpio0 46 GPIO_ACTIVE_LOW>;
+	};
+
+	/*
+	 * The DDC of HDMI_OUT. The board preset makes MIO50/51 GPIO, not I2C0 (docs/ps.md). U8 translates the
+	 * levels and the board has the pull-ups (docs/hdmi.md). A monitor answers at 0x50 with its EDID.
+	 */
+	hdmi_tx_ddc: i2c-ddc {
+		compatible = "i2c-gpio";
+		sda-gpios = <&gpio0 51 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
+		scl-gpios = <&gpio0 50 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
+		i2c-gpio,delay-us = <5>;	/* 100 kHz */
+		#address-cells = <1>;
+		#size-cells = <0>;
+	};
+};
+
+&clkc {
+	ps-clk-frequency = <50000000>;	/* OSC3 (docs/clocks.md) */
+};
+
+/*
+ * The board preset runs the CPU at 650 MHz: the ARM PLL at 1300 MHz (50 MHz x 26), divided by 2
+ * (docs/ps.md). The table of zynq-7000.dtsi has 666667 and 333334 kHz. With an unlisted start frequency,
+ * cpufreq-dt tries to change it, the clock refuses (-EBUSY), and the kernel stops at a BUG_ON. The table
+ * here has the divisors 2 and 4 of the same PLL.
+ */
+&cpu0 {
+	operating-points = <
+		/* kHz    uV */
+		650000  1000000
+		325000  1000000
+	>;
+};
+
+&gem0 {
+	status = "okay";
+	/*
+	 * The PHY adds the RGMII delays: its TXDLY and RXDLY straps are pulled up (docs/ethernet.md), and the
+	 * Realtek driver sets the same delays for rgmii-id. The meaning of the straps is not yet confirmed
+	 * (docs/unknowns.md).
+	 */
+	phy-mode = "rgmii-id";
+	phy-handle = <&ethernet_phy>;
+
+	mdio {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		/* MDIO address 1 by the straps PHY_AD2..0 = 001. */
+		ethernet_phy: ethernet-phy@1 {
+			reg = <1>;
+			/*
+			 * MIO9 is PHYRSTB. SYSCLK (125 MHz, H16) of the PL comes from this PHY and stops during
+			 * the reset.
+			 */
+			reset-gpios = <&gpio0 9 GPIO_ACTIVE_LOW>;
+			reset-assert-us = <10000>;
+			reset-deassert-us = <30000>;
+		};
+	};
+};
+
+&gpio0 {
+	status = "okay";
+};
+
+&qspi {
+	bootph-all;	/* U-Boot SPL uses it */
+	status = "okay";
+
+	flash@0 {
+		compatible = "jedec,spi-nor";
+		reg = <0>;
+		spi-max-frequency = <50000000>;
+		spi-rx-bus-width = <4>;
+		spi-tx-bus-width = <1>;
+
+		/* The flash can hold the only boot image of the board: Linux does not write it (AGENTS.md). */
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			partition@0 {
+				label = "qspi";
+				reg = <0x0 0x1000000>;
+				read-only;
+			};
+		};
+	};
+};
+
+&sdhci0 {
+	bootph-all;	/* U-Boot SPL uses it */
+	status = "okay";
+	/* The card runs at 3.3 V only, and the board has no write-protect line (docs/sd-card.md). */
+	no-1-8-v;
+	disable-wp;
+};
+
+&uart0 {
+	bootph-all;	/* U-Boot SPL uses it */
+	status = "okay";
+};
+
+&usb0 {
+	status = "okay";
+	dr_mode = "host";	/* type-A receptacle, ID on GND (docs/usb.md) */
+	usb-phy = <&usb_phy0>;
+};
