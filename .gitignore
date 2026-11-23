@@ -1,0 +1,6 @@
+# Build and test products belong outside the repository; these are the default names the scripts use
+# when they are run from here.
+__pycache__/
+.Xil/
+*.jou
+*.log

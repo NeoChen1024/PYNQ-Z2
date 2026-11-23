@@ -1,0 +1,29 @@
+# References
+
+The documents of this directory are third-party material. They are here because their links on the
+sites of AMD and TUL stopped working. Each file is as it was downloaded; a new revision is a new
+file. The documents of `docs/` cite these files and state their facts in their own words.
+
+The rights stay with the publisher of each document. The MIT License of this repository does not
+apply to them.
+
+| File | Document | Publisher | SHA-256 |
+|---|---|---|---|
+| `tul/TUL_PYNQ_Schematic_R12.pdf` | PYNQ-Z2 schematic, 15 sheets. The file name says R12; the title blocks say R10, dated 2018-01-09 | TUL Corporation | `2a5c8bd73291901b80bed0d5b178def40e0ac7ca6ca0ea56f7acad1dd4f3c7c9` |
+| `tul/pynqz2_user_manual_v1_0.pdf` | PYNQ-Z2 Reference Manual v1.0, 2018-05-17 | TUL Corporation | `47ebd0412126339cac0415a315f8878cb7dd7c138d406476cb4f928ca3c37404` |
+| `tul/pynq-z2_v1.0.xdc` | Master XDC of the board, v1.0 (original name `PYNQ-Z2 v1.0.xdc`) | TUL Corporation | `70207ba33ed98e5a157999969350948b95d28ed471ab43fdc50975f60ffcc25b` |
+| `tul/pynq-z2_v1.0_ps7_preset.tcl` | PS7 preset for the `processing_system7` IP, v1.0 (original name `PYNQ-Z2 v1.0.tcl`) | TUL Corporation | `1ebb6c4b332cb7f5f925488e6bce6aa2ce683469d0af7a4a34d6278cbbc6b6f2` |
+| `amd/ds187-XC7Z010-XC7Z020-Data-Sheet.pdf` | DS187 v1.21 (2020-12-01), Zynq-7000 SoC DC and AC Switching Characteristics | Xilinx (AMD) | `61e245380c01d2b9cc1350d529265d185e04c1c0379b0fdb3adcba76585c8dac` |
+| `amd/Zynq-7000_Xilinx_Wiki.pdf` | The Zynq-7000 pages of the Xilinx Wiki, exported 2024-01-04 | Xilinx (AMD) | `a4837b36df74949f389364c054d5e6533d815ed5cf610d0fd9dd51d07ef49453` |
+| `zynq-book/The_Zynq_Book_ebook_3.pdf` | L. H. Crockett, R. A. Elliot, M. A. Enderwitz, R. W. Stewart: The Zynq Book, 1st edition, 2014 ([zynqbook.com](http://www.zynqbook.com/)) | Strathclyde Academic Media | `c565a4d7c41226a5a43161e2cb0da27c2d2a18a1bc6799dfd273655bc2eeb5cb` |
+| `pinout/pinout.svg`, `pinout/pinout.png` | Pinout diagram of the board headers, by eneriz-daniel ([PYNQ forum](https://discuss.pynq.io/t/pynq-z2-pinout/4256/5)) | eneriz-daniel | svg `13d94bfca13524d88cf1eafa8eecc199d337d10a7c81fbc973e5d97bf094c965`, png `eb54515266215e0234b18f0b2eede0189d85dd9049babf8fc6d00854aa4e9b99` |
+
+The product page of the board was
+[amd.com: PYNQ-Z2](https://www.amd.com/en/corporate/university-program/aup-boards/pynq-z2.html).
+The upstream of this collection is [ZeroX29a/PynqZ2](https://github.com/ZeroX29a/PynqZ2).
+
+## Known faults
+
+- `tul/pynq-z2_v1.0.xdc` does not have the pin V7 (Raspberry Pi GPIO27). Its port `a` collides with
+  its bus `a[0..5]`. Ten of its comments give a wrong function name for the pin.
+  `pynq_z2_master.xdc` corrects these points: see `tools/tables.py`.
