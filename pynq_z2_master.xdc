@@ -2,7 +2,8 @@
 ##
 ## Remove the comment mark from the ports that the design uses, and rename them to the top-level
 ## ports. The port names are those of the TUL XDC, with the corrections in tools/tables.py.
-## The pins and nets come from the TUL schematic R12. pins.csv has the same data, pin by pin.
+## The pins and nets come from the TUL schematic R12, and each pin function was checked against the
+## package data of Vivado. pins.csv has the same data, pin by pin.
 ## The PS pins (MIO, DDR) are not here: the PS7 configuration sets them (docs/ps.md).
 
 ## Bank 0 is at 3.3 V (schematic sheet 12).
@@ -165,7 +166,7 @@ set_property CONFIG_VOLTAGE 3.3 [current_design]
 #set_property -dict { PACKAGE_PIN G15  IOSTANDARD LVCMOS33 } [get_ports { hdmi_tx_cec }]; # HDMI_TX_CEC IO_L19N_T3_VREF_35;  through the Schottky diode D2, cathode on the PL side: a read needs a pull-down
 #set_property -dict { PACKAGE_PIN L17  IOSTANDARD TMDS_33 } [get_ports { hdmi_tx_clk_n }]; # HDMI_TX_CLK_N IO_L11N_T1_SRCC_35
 #set_property -dict { PACKAGE_PIN L16  IOSTANDARD TMDS_33 } [get_ports { hdmi_tx_clk_p }]; # HDMI_TX_CLK_P IO_L11P_T1_SRCC_35
-#set_property -dict { PACKAGE_PIN K18  IOSTANDARD TMDS_33 } [get_ports { hdmi_tx_d_n[0] }]; # HDMI_TX_D0_N IO_L12N_T1_MRCC_35;  sheet 11 names this pin IO_L12P_T1_MRCC_35, the same as K17; it is the N side
+#set_property -dict { PACKAGE_PIN K18  IOSTANDARD TMDS_33 } [get_ports { hdmi_tx_d_n[0] }]; # HDMI_TX_D0_N IO_L12N_T1_MRCC_35;  sheet 11 names this pin IO_L12P_T1_MRCC_35, the same as K17; the package data gives IO_L12N_T1_MRCC_35
 #set_property -dict { PACKAGE_PIN J19  IOSTANDARD TMDS_33 } [get_ports { hdmi_tx_d_n[1] }]; # HDMI_TX_D1_N IO_L10N_T1_AD11N_35
 #set_property -dict { PACKAGE_PIN H18  IOSTANDARD TMDS_33 } [get_ports { hdmi_tx_d_n[2] }]; # HDMI_TX_D2_N IO_L14N_T2_AD4N_SRCC_35
 #set_property -dict { PACKAGE_PIN K17  IOSTANDARD TMDS_33 } [get_ports { hdmi_tx_d_p[0] }]; # HDMI_TX_D0_P IO_L12P_T1_MRCC_35

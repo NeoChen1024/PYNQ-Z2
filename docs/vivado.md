@@ -10,6 +10,7 @@ comment mark from the ports that the design uses, and rename them to the top-lev
 | Source | File | Use |
 |---|---|---|
 | Schematic R12 | `tools/schematic-pins.csv`, from `references/tul/TUL_PYNQ_Schematic_R12.pdf` | The pin, its function and its net. The reference |
+| Package data | `tools/package-dump.csv`, from `tools/package-dump.tcl` (Vivado 2025.2.1, `xc7z020clg400-1`) | The check of the function and the bank of each pin, and `package-pins.csv` |
 | TUL master XDC | `references/tul/pynq-z2_v1.0.xdc` | The port names and the I/O standards |
 | Board file | `board-files/TUL/pynq-z2/A.0/part0_pins.xml` | A comparison only |
 
@@ -28,13 +29,16 @@ The record follows the schematic. `tools/tables.py` corrects these faults of
 - The XDC has a port `a` on Y13 and a bus `a[0..5]`. One design cannot have both. Y13 is on the AREF
   position of the Arduino header J3 **[schematic]** sheet 4. The port is `ar_aref`.
 - Ten comments of the XDC give a wrong function name: D18, E18, F19, G20, H20, J14, J16, U18, U19
-  and W6. The package pins of these lines agree with the schematic. In each case the name of the
-  schematic completes its P/N pair, and the name of the XDC repeats the name of a different pin.
-  The Vivado package data will confirm this (unknowns.md).
+  and W6. The package pins of these lines agree with the schematic. The package data of Vivado gives
+  the function names of the schematic **[package]**.
 
 The schematic has one fault of this kind. Sheet 11 gives K17 and K18 both the name
-`IO_L12P_T1_MRCC_35`. K18 is the N side of the pair, as the TUL XDC says. `tools/tables.py` corrects
-it.
+`IO_L12P_T1_MRCC_35`. The package data gives K18 `IO_L12N_T1_MRCC_35`, as the TUL XDC says
+**[package]**. `tools/tables.py` corrects it.
+
+`tools/tables.py` compares the function name and the bank of each pin of the schematic with the
+package data of Vivado 2025.2.1 (`tools/package-dump.csv`). All 259 pins agree, after the K18
+correction. Each of the 125 user I/O pins of the PL is on the schematic **[package]**.
 
 ## Board files
 

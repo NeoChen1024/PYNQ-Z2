@@ -59,8 +59,9 @@ Read these points before you use the board:
 | `pins.csv` | Each FPGA pin that the schematic connects (PL and PS): bank, VCCO, function, net, port, I/O standard, the names in the TUL XDC and in the board file, and notes |
 | `pynq_z2_master.xdc` | Master XDC. Every port is a comment; remove the comment mark from the ports that you use |
 | `tools/schematic_pins.py`, `tools/schematic-pins.csv` | Read the pins and nets of the FPGA from the schematic PDF |
-| `tools/tables.py` | Makes `pins.csv` and `pynq_z2_master.xdc`, and prints where the sources differ |
-| `tools/package-dump.tcl` | Writes the package data of the XC7Z020 CLG400 from Vivado |
+| `tools/tables.py` | Makes `pins.csv`, `package-pins.csv` and `pynq_z2_master.xdc`, and prints where the sources differ |
+| `package-pins.csv` | All 400 pins of the CLG400 package: bank, function, package delay, and the net of the schematic |
+| `tools/package-dump.tcl`, `tools/package-dump.csv` | Write the package data of the XC7Z020 CLG400 from Vivado, and its output |
 | `ps7/` | Exports the PS7 configuration of the board preset: `ps7_init_gpl.c` for U-Boot SPL, `ps7_init.tcl` for a JTAG boot, and the XSA |
 | `jtag/load.sh`, `jtag/load.tcl` | Load a bitstream into the PL over the USB-JTAG. They do not touch the flash or a card |
 | `jtag/boot.sh`, `jtag/boot.tcl` | Boot the PS over JTAG with `xsdb`: `ps7_init`, an optional bitstream, data files and an ELF program |
@@ -83,7 +84,8 @@ sh $P/examples/pl-blinky/build.sh                       # into ./pynq-blinky
 sh $P/jtag/load.sh pynq-blinky/build/blinky.bit         # loads the PL; no flash or card is touched
 ```
 
-Vivado needs the Zynq-7000 devices. These steps have not run on a board yet.
+Vivado needs the Zynq-7000 devices. On 2026-11-23 the build ran with Vivado 2025.2.1: setup slack
++5.370 ns, hold slack +0.252 ns, 3 LUT and 30 FF. The load has not run on a board yet.
 
 ## License
 

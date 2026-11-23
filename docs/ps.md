@@ -127,7 +127,10 @@ Without `A15`, the controller can address 512 MiB of any of these parts. The mar
 chip was not read (unknowns.md).
 
 The board preset runs the DDR at 525 MHz (1050 Mb/s), CL 7, CWL 6, with write leveling, read gate
-and data eye training. It has the board delays for each byte lane (`PCW_UIPARAM_DDR_BOARD_DELAY0`
+and data eye training. Its four `PCW_UIPARAM_DDR_DQS_TO_CLK_DELAY` values are negative (-0.051,
+-0.006, -0.009 and -0.033 ns). Vivado 2025.2.1 gives a critical warning for each of them when
+`ps7/build.sh` applies the preset (2026-11-23): it says that negative DQS skew values can make the
+DDR fail. Whether the DDR is reliable with these values is not known (unknowns.md). It has the board delays for each byte lane (`PCW_UIPARAM_DDR_BOARD_DELAY0`
 to `3`, `PCW_UIPARAM_DDR_DQS_TO_CLK_DELAY_0` to `3`). The manual says that TUL calculated them from
 the PCB trace lengths. The data sheet DS187 gives 1066 Mb/s as the DDR3 limit of the XC7Z020.
 

@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-"""Makes pins.csv and pynq_z2_master.xdc from three sources of pin data, and reports where they differ:
+"""Makes pins.csv, package-pins.csv and pynq_z2_master.xdc from four sources of pin data, and reports
+where they differ:
 
 - tools/schematic-pins.csv: the nets of the TUL schematic R12 (made by tools/schematic_pins.py)
+- tools/package-dump.csv: the package data of Vivado for xc7z020clg400 (made by tools/package-dump.tcl)
 - references/tul/pynq-z2_v1.0.xdc: the master XDC of TUL
 - board-files/TUL/pynq-z2/A.0/part0_pins.xml: the Vivado board file
 
-    python3 tools/tables.py .            # writes ./pins.csv and ./pynq_z2_master.xdc
+    python3 tools/tables.py .     # writes ./pins.csv, ./package-pins.csv and ./pynq_z2_master.xdc
 
 The schematic is the reference. The port names come from the TUL XDC, with the corrections in RENAME
 and the pins in ADD. A finding about a pin goes into NOTES or CHECKED, and then the tables are made
@@ -18,6 +20,7 @@ ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 out = sys.argv[1] if len(sys.argv) > 1 else "."
 
 schematic = {r["pin"]: r for r in csv.DictReader(open(os.path.join(ROOT, "tools/schematic-pins.csv")))}
+package = {r["pin"]: r for r in csv.DictReader(open(os.path.join(ROOT, "tools/package-dump.csv")))}
 
 # Bank voltages: schematic sheet 12 (FPGA Power).
 VCCO = {"0": "3.3", "13": "3.3", "34": "3.3", "35": "3.3", "500": "3.3", "501": "1.8", "502": "1.5"}
@@ -41,13 +44,15 @@ for line in open(os.path.join(ROOT, "board-files/TUL/pynq-z2/A.0/part0_pins.xml"
     if m:
         board_file.setdefault(m[3], []).append(f"{m[1]} ({m[2]})")
 
-# Sheet 11 gives K17 and K18 both the name IO_L12P_T1_MRCC_35. K18 is the N side of the pair.
+# Sheet 11 gives K17 and K18 both the name IO_L12P_T1_MRCC_35. The package data gives K18 the N side.
 FUNC_FIX = {"K18": "IO_L12N_T1_MRCC_35"}
 # Sheet 10 draws the net of H6 away from the pin, and tools/schematic_pins.py does not find it.
 NET_FIX = {"H6": "DDR3_VREF"}
-# Comments of the TUL XDC with a function name that differs from the schematic. The pins agree; in each
-# case the schematic name completes its P/N pair and the TUL name repeats the name of another pin.
-TUL_COMMENT_WRONG = {"D18", "E18", "F19", "G20", "H20", "J14", "J16", "U18", "U19", "W6"}
+# Comments of the TUL XDC with a wrong function name. The pins agree with the schematic, and the package
+# data gives the name of the schematic. The script checks that the package data still says so.
+TUL_COMMENT_WRONG = {("D18", "ar_an0_n"), ("E18", "ar_an1_p"), ("J14", "ar_an2_n"), ("J16", "ar_an3_n"),
+                     ("H20", "ar_an4_n"), ("G20", "ar_an5_n"), ("U18", "rpio_06_r"), ("U19", "rpio_07_r"),
+                     ("F19", "rpio_08_r"), ("W6", "rpio_23_r")}
 
 # Corrections to the TUL XDC.
 RENAME = {
@@ -69,7 +74,7 @@ NOTES = {
     "T19": "drives HPD through the buffer Q7, which runs on HDMI_RX_5V0",
     "H17": "through the Schottky diode D1, cathode on the PL side: a read needs a pull-down",
     "G15": "through the Schottky diode D2, cathode on the PL side: a read needs a pull-down",
-    "K18": "sheet 11 names this pin IO_L12P_T1_MRCC_35, the same as K17; it is the N side",
+    "K18": "sheet 11 names this pin IO_L12P_T1_MRCC_35, the same as K17; the package data gives IO_L12N_T1_MRCC_35",
     "F16": "AR_SS. The board file in XilinxBoardStore 2025.2 and master calls this pin arduino_a0_a13_tri_i_10, its 2022.2 branch spi_ss_i. The schematic agrees with 2022.2",
     "T16": "AR_IO10. The board file in XilinxBoardStore 2025.2 and master calls this pin spi_ss_i, its 2022.2 branch arduino_a0_a13_tri_i_10. The schematic agrees with 2022.2",
     "H16": "125 MHz from CLK125 of the Ethernet PHY U5; it stops while MIO9 (PHYRSTB) holds the PHY in reset (docs/clocks.md)",
@@ -92,11 +97,17 @@ CHECKED = {}
 rows, differences = [], []
 for pin, s in schematic.items():
     func = FUNC_FIX.get(pin, s["schematic_function"])
-    bank = func.rsplit("_", 1)[1] if re.search(r"_\d+$", func) else ""
+    pkg = package.get(pin)
+    if pkg is None:
+        differences.append(f"{pin}: on the schematic, not in the package")
+        continue
+    if pkg["pin_func"] != func:
+        differences.append(f"{pin}: the package data gives the function {pkg['pin_func']}, the schematic {func}")
+    bank = pkg["bank"]
     ports = []
     for t in tul.get(pin, []):
-        if t["func"] != func and pin not in TUL_COMMENT_WRONG:
-            differences.append(f"{pin}: the TUL XDC gives the function {t['func']}, the schematic {func}")
+        if (t["func"] != pkg["pin_func"]) != ((pin, t["port"]) in TUL_COMMENT_WRONG):
+            differences.append(f"{pin}: the TUL XDC gives the function {t['func']}, the package {pkg['pin_func']}")
         ports.append(dict(t, port=RENAME.get((pin, t["port"]), t["port"])))
     if pin in ADD:
         ports.append(dict(ADD[pin], func=func))
@@ -113,6 +124,10 @@ for pin, s in schematic.items():
         "schematic_sheet": s["sheet"], "checked": CHECKED.get(pin, ""), "note": NOTES.get(pin, ""),
         "_ports": ports,
     })
+# Every user I/O of the PL is on the schematic, with a net or without (V5).
+for pin, r in package.items():
+    if r["pin_func"].startswith("IO_") and pin not in schematic:
+        differences.append(f"{pin}: a PL I/O of the package, not on the schematic")
 for pin in sorted(set(tul) - set(schematic)):
     differences.append(f"{pin}: in the TUL XDC, not on the schematic")
 for pin in sorted(set(board_file) - set(schematic)):
@@ -132,6 +147,15 @@ with open(os.path.join(out, "pins.csv"), "w", newline="") as f:
     w.writeheader()
     w.writerows(rows)
 
+# All the pins of the package, with the net of the schematic where it has one.
+nets = {r["pin"]: r["net"] for r in rows}
+with open(os.path.join(out, "package-pins.csv"), "w", newline="") as f:
+    w = csv.writer(f, lineterminator="\n")
+    w.writerow(["pin", "bank", "pin_func", "min_delay_ps", "max_delay_ps", "net"])
+    for pin in sorted(package, key=lambda p: key({"pin": p})):
+        r = package[pin]
+        w.writerow([pin, r["bank"], r["pin_func"], r["min_delay_ps"], r["max_delay_ps"], nets.get(pin, "")])
+
 # The master XDC: every port is a comment, in the sections of the TUL XDC.
 by_section = {}
 for r in rows:
@@ -142,7 +166,8 @@ with open(os.path.join(out, "pynq_z2_master.xdc"), "w") as f:
 ##
 ## Remove the comment mark from the ports that the design uses, and rename them to the top-level
 ## ports. The port names are those of the TUL XDC, with the corrections in tools/tables.py.
-## The pins and nets come from the TUL schematic R12. pins.csv has the same data, pin by pin.
+## The pins and nets come from the TUL schematic R12, and each pin function was checked against the
+## package data of Vivado. pins.csv has the same data, pin by pin.
 ## The PS pins (MIO, DDR) are not here: the PS7 configuration sets them (docs/ps.md).
 
 ## Bank 0 is at 3.3 V (schematic sheet 12).

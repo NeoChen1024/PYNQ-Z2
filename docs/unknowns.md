@@ -14,6 +14,8 @@ question removes it here and updates that document.
   256M x 16, and `preset.xml` uses `MT41J256M16 RE-125`. The marking on the board was not read.
   (ps.md)
 - The power-up order of the four outputs of the TPS65400. (power.md)
+- Whether the DDR3 works reliably with the negative DQS-to-CLK delays of the board preset, about
+  which Vivado warns. (ps.md)
 
 ## Pins and headers
 
@@ -27,8 +29,6 @@ question removes it here and updates that document.
   shows no pull resistor on it. (headers.md)
 - What V5 connects to. The revision history of the schematic names it `AU_RESET`; sheet 11 shows no
   net. (audio.md)
-- Whether the function names of the ten pins that the TUL XDC comments name differently are as the
-  schematic gives them. The Vivado package data will show it. (vivado.md)
 - Whether the output enable of Q7, the HPD buffer of `HDMI_IN`, floats when R299 (`/X`) is not
   fitted. (hdmi.md)
 

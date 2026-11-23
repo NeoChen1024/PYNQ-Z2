@@ -3,8 +3,8 @@
 The PS boots U-Boot SPL, U-Boot and a mainline kernel, with an Alpine Linux root file system on F2FS
 on the card. No Vitis FSBL and no PetaLinux are used. The PL is free for the designs of the user.
 
-**Status:** nothing of this has run on a board yet. The SPL needs `ps7_init_gpl.c` from
-`ps7/build.sh`, which needs the Zynq-7000 devices in Vivado.
+**Status:** nothing of this has run on a board yet. On 2026-11-23 `ps7/build.sh` (Vivado 2025.2.1)
+exported the PS7 configuration of the board preset, and `build-uboot.sh` built the SPL with it.
 
 On 2026-11-23 the kernel, the device tree and the root file system booted in QEMU (`qemu.sh`, QEMU
 machine `xilinx-zynq-a9`) to the login prompt. In QEMU, the root F2FS mounted, mdev loaded

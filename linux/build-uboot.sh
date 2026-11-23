@@ -7,8 +7,9 @@
 #
 #   [WORK=dir] [CROSS_COMPILE=arm-none-eabi-] sh build-uboot.sh /path/to/u-boot /path/to/ps7_init_gpl.c
 #
-# ps7_init_gpl.h must be beside ps7_init_gpl.c. "none" in place of the file builds without the PS
-# initialization: such an SPL cannot start the board, and is good only to test the build.
+# ps7_init_gpl.c and ps7_init_gpl.h come from ps7/build.sh; the .h must be beside the .c. "none" in
+# place of the file builds without the PS initialization: such an SPL cannot start the board, and is
+# good only to test the build.
 # Writes into WORK, ./pynq-uboot in the current directory by default: ubuild/ (the objects),
 # boot.bin (the boot image with the SPL), u-boot.img (U-Boot for the SPL) and u-boot.elf (for
 # jtag/boot.sh).
@@ -23,8 +24,13 @@ export CROSS_COMPILE="${CROSS_COMPILE:-arm-none-eabi-}"
 
 ps7=""
 if [ "$2" != none ]; then
-    ps7="$(cd "$(dirname "$2")" && pwd)/$(basename "$2")"
-    [ -f "$ps7" ] && [ -f "${ps7%.c}.h" ] || { echo "need $2 and ${2%.c}.h" >&2; exit 2; }
+    [ -f "$2" ] && [ -f "${2%.c}.h" ] || { echo "need $2 and ${2%.c}.h" >&2; exit 2; }
+    # Vivado writes "int ps7_init();", which U-Boot refuses (-Werror=strict-prototypes). A copy in WORK
+    # gets "(void)" on the functions without parameters; the export of Vivado stays as it is.
+    mkdir -p "$work/ps7"
+    sed -E 's/^([a-z][a-z0-9_ ]*[ *]?[A-Za-z_][A-Za-z0-9_]*) ?\(\)/\1(void)/' "$2" > "$work/ps7/ps7_init_gpl.c"
+    sed -E 's/^([a-z][a-z0-9_ ]*[ *]?[A-Za-z_][A-Za-z0-9_]*) ?\(\)/\1(void)/' "${2%.c}.h" > "$work/ps7/ps7_init_gpl.h"
+    ps7="$work/ps7/ps7_init_gpl.c"
 fi
 
 install -m 644 "$here/zynq-pynq-z2.dts" "$src/arch/arm/dts/zynq-pynq-z2.dts"

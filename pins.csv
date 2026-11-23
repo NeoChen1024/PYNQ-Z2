@@ -128,7 +128,7 @@ K4,502,1.5,PS_DDR_A7_502,MEM_ADD7,,,,,10,,
 K14,35,3.3,IO_L20P_T3_AD6P_35,AR_AN2_P,ar_an2_p,LVCMOS33,ar_an2_p,,11,,
 K16,35,3.3,IO_L24P_T3_AD15P_35,AR_AN3_P,ar_an3_p,LVCMOS33,ar_an3_p,,11,,
 K17,35,3.3,IO_L12P_T1_MRCC_35,HDMI_TX_D0_P,hdmi_tx_d_p[0],TMDS_33,hdmi_tx_d_p[0],TMDS_OUT_data_p_0 (LVCMOS33),11,,
-K18,35,3.3,IO_L12N_T1_MRCC_35,HDMI_TX_D0_N,hdmi_tx_d_n[0],TMDS_33,hdmi_tx_d_n[0],TMDS_OUT_data_n_0 (LVCMOS33),11,,"sheet 11 names this pin IO_L12P_T1_MRCC_35, the same as K17; it is the N side"
+K18,35,3.3,IO_L12N_T1_MRCC_35,HDMI_TX_D0_N,hdmi_tx_d_n[0],TMDS_33,hdmi_tx_d_n[0],TMDS_OUT_data_n_0 (LVCMOS33),11,,"sheet 11 names this pin IO_L12P_T1_MRCC_35, the same as K17; the package data gives IO_L12N_T1_MRCC_35"
 K19,35,3.3,IO_L10P_T1_AD11P_35,HDMI_TX_D1_P,hdmi_tx_d_p[1],TMDS_33,hdmi_tx_d_p[1],TMDS_OUT_data_p_1 (LVCMOS33),11,,
 L1,502,1.5,PS_DDR_A5_502,MEM_ADD5,,,,,10,,
 L2,502,1.5,PS_DDR_CKP_502,MEM_CLK0_P,,,,,10,,

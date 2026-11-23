@@ -16,9 +16,9 @@ The repository is public. The board, the cards and the LAN that it connects to b
   gives the title, the revision, the source and the SHA-256 of each file. Do not change these files.
 - `board-files/` holds the Vivado board files of the board. `board-files/README.md` names the
   commit of XilinxBoardStore that they come from.
-- `pins.csv` and `pynq_z2_master.xdc` are generated. `tools/tables.py` makes them from
-  `tools/schematic-pins.csv`, `references/tul/pynq-z2_v1.0.xdc` and the board file
-  `part0_pins.xml`. Do not edit the two outputs by hand. A finding about a pin goes into `NOTES`,
+- `pins.csv`, `package-pins.csv` and `pynq_z2_master.xdc` are generated. `tools/tables.py` makes
+  them from `tools/schematic-pins.csv`, `tools/package-dump.csv`, `references/tul/pynq-z2_v1.0.xdc`
+  and the board file `part0_pins.xml`. Do not edit the outputs by hand. A finding about a pin goes into `NOTES`,
   `CHECKED`, `RENAME` or `ADD` of `tools/tables.py`; then make the tables again.
 - `tools/schematic-pins.csv` is made by `tools/schematic_pins.py` from the schematic PDF.
 - [LICENSE](LICENSE) owns the licensing terms of the files that the owner wrote. The README says
