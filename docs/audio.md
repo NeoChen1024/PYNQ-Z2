@@ -33,9 +33,32 @@ The circuit, **[schematic] sheet 7**:
   further 50 ohm (R80) at the codec.
 - R297 and R298 (2.2 kohm) pull `AU_SDA` and `AU_SCL` up to `VCC3V3`. Thus the control bus is I2C.
 - R301 and R312 (10 kohm) pull `ADR0` and `ADR1` up to `VCC3V3`. If the design does not drive the
-  two pins, both address pins are high. The ADAU1761 data sheet gives the I2C address for each
-  state of ADR0 and ADR1. It is not in this repository.
-- R180 (2.2 kohm, marked `/X`) can pull `AU_MCLK_R` up.
+  two pins, both address pins are high.
+- R180 (2.2 kohm, marked `/X`) can pull `AU_MCLK_R` up. R180 is not fitted **[measured]**: U5
+  followed the internal pull of the PL in both pinprobe builds (2026-11-24, `tools/pinprobe/`).
+
+## Control port
+
+The ADAU1761 data sheet (`references/adi/adau1761_RevF.pdf`) gives these facts:
+
+- The control port starts in I2C mode. Three low pulses on CLATCH (`ADR0`) switch it to SPI mode,
+  and only a power cycle brings it back (page 39). **A design must not toggle `ADR0`.**
+- The 7-bit I2C address is 0x38 + 2 × ADR1 + ADR0 (Table 21, page 36). The subaddress has 16 bits.
+  The bus runs at up to 400 kHz (page 10).
+- Without the core clock, only R0 (0x4000) and R1 (0x4002) are accessible; all other registers
+  need a valid MCLK and `COREN` (page 36, Table 35 on page 51).
+- The PLL takes MCLK from 8 MHz to 27 MHz (page 24). The direct mode takes 256, 512, 768 or 1024
+  times the sample rate (page 22).
+
+On 2026-11-24, the I2C scan of `tools/pinprobe/` found the codec **[measured]**:
+
+| ADR1 | ADR0 | Address that answered |
+|---|---|---|
+| High (pull-up) | High (pull-up) | 0x3B |
+| Low (driven by the PL) | High (pull-up) | 0x39 |
+
+The codec answered at 0x3B also without MCLK. The scan sent only the address of each device (0x08
+to 0x77). No other device answered on the bus.
 
 The schematic does not give a frequency for MCLK. The design chooses it, within the limits of the
 ADAU1761 data sheet. The manual gives stereo 48 kHz, and sample rates from 8 kHz to 96 kHz
@@ -43,7 +66,8 @@ ADAU1761 data sheet. The manual gives stereo 48 kHz, and sample rates from 8 kHz
 
 There is no reset pin. The revision history of the schematic (sheet 2) says that the net of V5
 became `AU_RESET`. On sheet 11 of R12, V5 has no net. The ADAU1761 has no reset input in the
-symbol of sheet 7.
+symbol of sheet 7. V5 is not connected on this board **[measured]**: it followed the internal pull
+of the PL in both pinprobe builds (2026-11-24).
 
 ## Jacks
 

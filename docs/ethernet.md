@@ -57,10 +57,21 @@ The PHY reads its configuration from these pins at reset **[schematic]** sheet 5
 | 35 | `LED1/PHY_AD1` | 4.7 kΩ (R129) to GND |
 | 32 | `LED2/RXDLY` | 4.7 kΩ (R125) pull-up to `VCC3V3` |
 
-`PHY_AD2`, `PHY_AD1`, `PHY_AD0` are low, low, high. This agrees with the MDIO address 1 of the
-manual. `TXDLY` and `RXDLY` are both pulled up. The meaning of each strap value (for example,
-whether high adds the RGMII clock delay) is in the RTL8211E datasheet, which is not in
-`references/` (unknowns.md). The Linux device tree must agree with it (`phy-mode`).
+The RTL8211E data sheet (`references/realtek/rtl8211e-vb-vl-cg_datasheet_1.6.pdf`, Tables 3, 7,
+12 and 13, PDF pages 18 to 25) gives the meaning of the straps. The PHY latches them at reset:
+
+| Strap | Level | Meaning |
+|---|---|---|
+| `PHY_AD2`, `PHY_AD1`, `PHY_AD0` | Low, low, high | MDIO address 1 |
+| `SELRGV` | High | RGMII at 1.5 V or 1.8 V, as the -VL needs |
+| `TXDLY` | High | The PHY adds 2 ns to TXC |
+| `RXDLY` | High | The PHY adds 2 ns to RXC |
+| `AN1`, `AN0` | High, high | Auto-negotiation, with 10, 100 and 1000 Mb/s advertised |
+
+Thus the PHY adds both RGMII delays, and the MAC must not add them: `phy-mode = "rgmii-id"` in the
+device tree (linux/README.md). The data sheet gives no register for the delays. The PHY also
+answers at address 0, the broadcast address (Table 13). The polarity of each LED follows its
+strap (section 7.8, PDF page 26): LED0 and LED2 are active low, LED1 is active high.
 
 ## LEDs
 

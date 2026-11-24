@@ -70,5 +70,25 @@ owner saw it not fitted (2026-11-24). No FPGA pin connects to that I2C port.
   U18 are good. The manual states the same.
 - `PG_ALL` also switches the power LED CR8 through Q10.
 
-The manual names the power LED, the `DONE` LED and the status LEDs of USB and Ethernet. The
-sequence of the four outputs of U18 is not known (unknowns.md).
+The manual names the power LED, the `DONE` LED and the status LEDs of USB and Ethernet.
+
+## Sequence of U18
+
+The order of the four outputs is not set by a pin. The TPS65400 keeps it in its EEPROM, which only
+I2C can change (data sheet `references/ti/tps65400_SLVSCQ9E.pdf`, section 8.3.1, pages 13 to 15).
+On the board **[schematic]** sheets 14 and 15:
+
+- `ENSW1/ENSEQ`, `EN2`, `EN3` and `EN4` are all on one net, `EN_1`. R290 and R291 divide `VCC5V0`
+  to it, and Q17 pulls it low while the power switch is off.
+- `CE` goes only to JP2, which is not fitted. The pin has an internal pull-up (page 4).
+- Each soft-start pin has 33 nF (C173, C180, C187, C193). R271 (150 kohm) on `RCLOCK_SYNC` sets
+  about 1.2 MHz (Equation 3, page 18).
+- The feedback dividers give 1.02 V, 3.30 V, 1.80 V and 1.50 V with the default reference of
+  0.8 V (Equation 4, pages 23 and 24).
+
+With the factory defaults (SEQUENCE_ORDER 0 for all outputs, page 15), all four outputs start
+together, with the same soft-start time of about 5 ms (Equation 2, pages 17 and 18). This is
+derived, not measured. It is not the order that DS187 recommends (VCCINT first, page 8), but
+DS187 gives that order for the current and the I/O state, not as a limit. Whether TUL changed the
+EEPROM of U18 is not known; a measurement of the four rails at power-on would show the order
+(unknowns.md).

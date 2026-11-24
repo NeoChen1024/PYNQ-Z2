@@ -29,7 +29,11 @@ PHY is in reset and `CLK125` stops **[manual]**.
 - The PHY gives `CLK125` with its default settings **[measured]**. On 2026-11-24, pl-blinky
   counted on LD0 to LD3 from `SYSCLK`. No software had initialized the PS or the PHY. The frequency
   was not measured.
-- Whether a register write to the PHY can stop `CLK125` is not known (unknowns.md).
+- A register write can stop `CLK125`: bit 4 of PHYCR (register 0x10, page 0) is "Disable CLK125"
+  (RTL8211E data sheet, Table 37, PDF page 49). Its default is 0, `CLK125` on. While the bit is
+  1, `SYSCLK` stays low. This was not tested on the board.
+- The RTL8211E data sheet does not say whether `CLK125` stops while `PHYRSTB` is low. The manual
+  says that it stops.
 
 The master XDC has the clock constraint for it: `create_clock -period 8.00` on `sysclk`.
 
