@@ -1,6 +1,7 @@
 #!/usr/bin/env sh
 # Loads a bitstream into the PL of the PYNQ-Z2 over the USB-JTAG of the board (J8). It is gone at
 # power-off, and no flash or card is touched. The logs (load.log, load.out) go beside the bitstream.
+# If Linux runs on the PS, the design must have a PS7 cell, or the PS stops (docs/vivado.md).
 #
 #   [VIVADO=/path/to/vivado] sh load.sh design.bit
 set -eu

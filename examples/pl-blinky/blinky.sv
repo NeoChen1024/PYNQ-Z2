@@ -15,4 +15,8 @@ module pynq_z2_blinky (
     always_ff @(posedge sysclk) count <= count + 1'b1;
     assign led = (sw[0] ? count[29:26] : count[27:24]) ^ {4{sw[1]}};
     assign {led5_r, led4_b, led4_g, led4_r} = btn;
+
+    // A PS7 cell with nothing connected. Without a PS7 cell, a load of this bitstream while Linux
+    // runs stops the PS within about 20 s (docs/vivado.md). Vivado ties the inputs of the empty cell.
+    PS7 ps7_i ();
 endmodule

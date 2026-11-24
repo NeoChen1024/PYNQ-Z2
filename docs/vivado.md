@@ -74,3 +74,21 @@ question.
 
 `references/tul/pynq-z2_v1.0_ps7_preset.tcl` is the PS7 preset of TUL for the `processing_system7`
 IP. The board file has a preset too (`preset.xml`). ps.md describes the PS configuration.
+
+## Every PL design has a PS7 cell
+
+**A bitstream without a PS7 cell stops the PS if it is loaded while Linux runs** **[measured]**.
+On 2026-11-24, Linux 6.18.64 ran from the card, with `LVL_SHFTR_EN` (0xF8000900) at 0xF:
+
+| Bitstream, loaded with `jtag/load.sh` | Result |
+|---|---|
+| pl-blinky without a PS7 cell | SSH stopped answering 20 s to 30 s after the load, and the console too |
+| pinprobe without a PS7 cell | The same (two times). Over JTAG, CPU0 was in the FIQ handler `__fiq_usr` of the kernel |
+| No load; only `xsdb` and Vivado opened the JTAG target | No effect |
+| pl-blinky with an empty PS7 cell (`PS7 ps7_i ();`) | No effect in 5 minutes |
+| pinprobe with an empty PS7 cell | No effect; the pin reads were the same as without the cell |
+
+Thus each design of this repository instantiates `PS7` with nothing connected. Vivado ties the
+inputs of the cell, as the `processing_system7` IP does. A block design with `processing_system7`
+has the cell already. A bitstream that is loaded before Linux starts, or in JTAG mode, is not
+affected. Which signal from the PL to the PS causes the stop is not known (unknowns.md).
