@@ -56,8 +56,8 @@ The board file differs from the schematic on these pins:
 
 | Pin | Schematic net | Board file | Note |
 |---|---|---|---|
-| P15 | `AR_SDA` | `i2c_scl_i` | The manual agrees with the board file. See headers.md |
-| P16 | `AR_SCL` | `i2c_sda_i` | The manual agrees with the board file. See headers.md |
+| P15 | `AR_SDA` | `i2c_scl_i` | The board file is right: P15 is SCL (measured, headers.md) |
+| P16 | `AR_SCL` | `i2c_sda_i` | The board file is right: P16 is SDA (measured, headers.md) |
 | F16 | `AR_SS` | `arduino_a0_a13_tri_i_10` | The branch `2022.2` of XilinxBoardStore has `spi_ss_i`, which agrees with the schematic |
 | T16 | `AR_IO10` | `spi_ss_i` | The branch `2022.2` has `arduino_a0_a13_tri_i_10`, which agrees with the schematic |
 | V7 | `RP_IO04` (GPIO27) | not present | |
@@ -65,10 +65,8 @@ The board file differs from the schematic on these pins:
 The board file gives `LVCMOS33` to the HDMI output pairs. The TUL XDC gives `TMDS_33`. The board
 file has no pin for H17 (`HDMI_RX_CEC`).
 
-P15 and P16 are the I2C pins of the Arduino header. The schematic and the TUL XDC call P15 `AR_SDA`.
-The manual and the board file call it SCL. The record follows the schematic for the port names, but
-the position of P15 on J3 suggests SCL. headers.md gives the details, and unknowns.md has the
-question.
+P15 and P16 are the I2C pins of the Arduino header. The schematic and the TUL XDC call P15 `AR_SDA`,
+but P15 is SCL on the board (headers.md). The master XDC names P15 `ar_scl` and P16 `ar_sda`.
 
 ## PS7 preset
 

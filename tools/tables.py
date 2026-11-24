@@ -58,6 +58,10 @@ TUL_COMMENT_WRONG = {("D18", "ar_an0_n"), ("E18", "ar_an1_p"), ("J14", "ar_an2_n
 RENAME = {
     # "a" and the bus a[0..5] cannot both be ports of one design. The pin is on the AREF position of J3.
     ("Y13", "a"): "ar_aref",
+    # The silkscreen SDA pin of J3 is P16, and SCL is P15 (measured 2026-11-24, docs/headers.md). The
+    # schematic nets and the TUL XDC have the two names the other way round.
+    ("P16", "ar_scl"): "ar_sda",
+    ("P15", "ar_sda"): "ar_scl",
 }
 ADD = {
     # Schematic sheet 4: RP_IO04 goes through R87 to RPIO_27_R, GPIO27 on pin 13 of the Raspberry Pi
@@ -67,9 +71,10 @@ ADD = {
 NOTES = {
     "V7": "RPi GPIO27 (header pin 13): not in the TUL XDC or the board file",
     "Y13": "on the AREF position of the Arduino header J3. The TUL XDC calls the port a, which collides with the bus a[0..5]",
-    "P15": "on J3.10, the SCL position of an Arduino Uno R3. The schematic and the TUL XDC call it AR_SDA; the manual and the board file call it SCL. Not measured",
-    "P16": "on J3.9, the SDA position of an Arduino Uno R3. The schematic and the TUL XDC call it AR_SCL; the manual and the board file call it SDA. Not measured",
-    "U13": "also PUDC_B. The schematic shows no pull resistor, only 200 ohm to Arduino AR2",
+    "P15": "SCL of the Arduino header (J3.10, silkscreen SCL), measured. The schematic net and the TUL XDC call it AR_SDA",
+    "P16": "SDA of the Arduino header (J3.9, silkscreen SDA), measured. The schematic net and the TUL XDC call it AR_SCL",
+    "U13": "also PUDC_B. No external pull (measured): only 200 ohm to Arduino AR2",
+    "J15": "U14 and its pull-up R209 are not fitted (measured): the pin is not connected",
     "R19": "inverted: low while a sink asserts HPD (Q8)",
     "T19": "drives HPD through the buffer Q7, which runs on HDMI_RX_5V0",
     "H17": "through the Schottky diode D1, cathode on the PL side: a read needs a pull-down",
@@ -85,14 +90,26 @@ NOTES = {
     "C7": "PG_ALL, the PGOOD output of the TPS65400",
     "B10": "the button SRST1",
     "H6": "on DDR3_VREF, as P6",
-    "V5": "VREF of bank 13; no net on sheet 11, but the revision history of the schematic names it AU_RESET",
+    "V5": "VREF of bank 13; no net on sheet 11 and no connection (measured), but the revision history of the schematic names it AU_RESET",
 }
 for p in ("B8", "D6", "B7", "A6", "A5", "D8", "D5"):
     NOTES[p] = "boot strap, MIO2 to MIO8 (docs/boot.md)"
 for p in ("Y18", "Y19", "Y16", "Y17", "U18", "U19", "W18", "W19"):
     NOTES[p] = "shared by PmodA and the Raspberry Pi header"
-# Pins that ran on the board, with the design and the date (see docs/). None yet.
+# Pins that ran on the board, with the design and the date (see docs/).
 CHECKED = {}
+for p in ("H16", "M20", "M19", "D19", "D20", "L20", "L19", "R14", "P14", "N16", "M14", "N15", "G17", "L15", "M15"):
+    CHECKED[p] = "pl-blinky 2026-11-24"
+# The GND tap of tools/pinprobe: a wire from GND on each header pin, with the pin that went low.
+for p, where in (("P16", "J3 SDA"), ("P15", "J3 SCL"), ("Y18", "RPi 7"), ("V6", "RPi 8"), ("Y6", "RPi 10"),
+                 ("Y7", "RPi 18"), ("F20", "RPi 22"), ("U19", "RPi 26"), ("Y19", "RPi 29"), ("U18", "RPi 31")):
+    CHECKED[p] = f"pinprobe GND tap on {where}, 2026-11-24"
+for p in ("U9", "T9", "M18"):
+    CHECKED[p] = "pinprobe I2C scan of the codec, 2026-11-24"
+CHECKED["T19"] = "pinprobe HPD to an HDMI source, 2026-11-24"
+for p in ("J15", "V5", "U5", "U13"):
+    CHECKED[p] = "pinprobe census, 2026-11-24"
+# The other pins of tools/pinprobe/census-2026-11-24.csv agree with the schematic but were not used.
 
 rows, differences = [], []
 for pin, s in schematic.items():

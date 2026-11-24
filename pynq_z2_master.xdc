@@ -86,7 +86,7 @@ set_property CONFIG_VOLTAGE 3.3 [current_design]
 ## Arduino Digital I/O
 #set_property -dict { PACKAGE_PIN T14  IOSTANDARD LVCMOS33 } [get_ports { ar[0] }]; # AR_IO0 IO_L5P_T0_34
 #set_property -dict { PACKAGE_PIN U12  IOSTANDARD LVCMOS33 } [get_ports { ar[1] }]; # AR_IO1 IO_L2N_T0_34
-#set_property -dict { PACKAGE_PIN U13  IOSTANDARD LVCMOS33 } [get_ports { ar[2] }]; # AR_IO2 IO_L3P_T0_DQS_PUDC_B_34;  also PUDC_B. The schematic shows no pull resistor, only 200 ohm to Arduino AR2
+#set_property -dict { PACKAGE_PIN U13  IOSTANDARD LVCMOS33 } [get_ports { ar[2] }]; # AR_IO2 IO_L3P_T0_DQS_PUDC_B_34;  also PUDC_B. No external pull (measured): only 200 ohm to Arduino AR2
 #set_property -dict { PACKAGE_PIN V13  IOSTANDARD LVCMOS33 } [get_ports { ar[3] }]; # AR_IO3 IO_L3N_T0_DQS_34
 #set_property -dict { PACKAGE_PIN V15  IOSTANDARD LVCMOS33 } [get_ports { ar[4] }]; # AR_IO4 IO_L10P_T1_34
 #set_property -dict { PACKAGE_PIN T15  IOSTANDARD LVCMOS33 } [get_ports { ar[5] }]; # AR_IO5 IO_L5N_T0_34
@@ -115,8 +115,8 @@ set_property CONFIG_VOLTAGE 3.3 [current_design]
 #set_property -dict { PACKAGE_PIN F16  IOSTANDARD LVCMOS33 } [get_ports { ck_ss }]; # AR_SS IO_L6P_T0_35;  AR_SS. The board file in XilinxBoardStore 2025.2 and master calls this pin arduino_a0_a13_tri_i_10, its 2022.2 branch spi_ss_i. The schematic agrees with 2022.2
 
 ## Arduino I2C
-#set_property -dict { PACKAGE_PIN P16  IOSTANDARD LVCMOS33 } [get_ports { ar_scl }]; # AR_SCL IO_L24N_T3_34;  on J3.9, the SDA position of an Arduino Uno R3. The schematic and the TUL XDC call it AR_SCL; the manual and the board file call it SDA. Not measured
-#set_property -dict { PACKAGE_PIN P15  IOSTANDARD LVCMOS33 } [get_ports { ar_sda }]; # AR_SDA IO_L24P_T3_34;  on J3.10, the SCL position of an Arduino Uno R3. The schematic and the TUL XDC call it AR_SDA; the manual and the board file call it SCL. Not measured
+#set_property -dict { PACKAGE_PIN P15  IOSTANDARD LVCMOS33 } [get_ports { ar_scl }]; # AR_SDA IO_L24P_T3_34;  SCL of the Arduino header (J3.10, silkscreen SCL), measured. The schematic net and the TUL XDC call it AR_SDA
+#set_property -dict { PACKAGE_PIN P16  IOSTANDARD LVCMOS33 } [get_ports { ar_sda }]; # AR_SCL IO_L24N_T3_34;  SDA of the Arduino header (J3.9, silkscreen SDA), measured. The schematic net and the TUL XDC call it AR_SCL
 
 ## Raspberry Digital I/O
 #set_property -dict { PACKAGE_PIN W18  IOSTANDARD LVCMOS33 } [get_ports { rpio_02_r }]; # JA4_P IO_L22P_T3_34;  shared by PmodA and the Raspberry Pi header
@@ -175,4 +175,4 @@ set_property CONFIG_VOLTAGE 3.3 [current_design]
 #set_property -dict { PACKAGE_PIN R19  IOSTANDARD LVCMOS33 } [get_ports { hdmi_tx_hpdn }]; # HDMI_TX_HPDN IO_0_34;  inverted: low while a sink asserts HPD (Q8)
 
 ## Crypto SDA
-#set_property -dict { PACKAGE_PIN J15  IOSTANDARD LVCMOS33 } [get_ports { crypto_sda }]; # CRYPTO_SDA IO_25_35
+#set_property -dict { PACKAGE_PIN J15  IOSTANDARD LVCMOS33 } [get_ports { crypto_sda }]; # CRYPTO_SDA IO_25_35;  U14 and its pull-up R209 are not fitted (measured): the pin is not connected

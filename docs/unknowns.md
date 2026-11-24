@@ -8,38 +8,29 @@ question removes it here and updates that document.
 - Which revision of the schematic the board follows. The file is named R12, its PDF title says
   `r11_0109`, and the title blocks say R10 (2018-01-09). The board has no revision mark on its
   back. (fpga.md)
-- What `/X` on the schematic means. U14, J13, J14 and JP2 are not fitted, but JP3 is fitted (seen
-  2026-11-24). Thus `/X` does not always mean "not fitted". R208, R209, R139 to R146, R299 and C19
-  were not checked. (crypto.md, hdmi.md, jtag-uart.md, power.md)
-- The power-up order of the four outputs of the TPS65400. (power.md)
+- What `/X` on the schematic means. U14, J13, J14, JP2, R180 and R209 are not fitted, but JP3 is
+  fitted (2026-11-24). Thus `/X` does not always mean "not fitted". R208, R299 and C19 were not
+  checked; R139 to R146 are probably the empty footprints beside `HDMI_IN`. (crypto.md, hdmi.md,
+  jtag-uart.md, power.md, audio.md)
+- The power-up order of the four outputs of the TPS65400. With its factory EEPROM, they start
+  together; whether TUL changed the EEPROM is not known. A measurement of the rails would show it.
+  (power.md)
 - How much timing margin the DDR3 has with the negative DQS-to-CLK delays of the board preset,
   about which Vivado warns. One pass of a memory test found no error. (ps.md)
 
 ## Pins and headers
 
-- Which Arduino I2C line is SDA. The schematic and the TUL XDC give `AR_SDA` on P15 (J3.10). The
-  manual and the board file give SDA on P16 (J3.9), which is the SDA position of an Arduino Uno R3.
-  (headers.md)
-- Whether the RPi table of the manual describes an earlier board. It gives other FPGA pins for RPi
-  pins 7, 8, 10, 18, 22, 26, 29 and 31 than the schematic, the TUL XDC and the board file.
-  (headers.md)
-- What U13 (`PUDC_B`) does at configuration if nothing is connected to Arduino AR2. The schematic
-  shows no pull resistor on it. (headers.md)
-- What V5 connects to. The revision history of the schematic names it `AU_RESET`; sheet 11 shows no
-  net. (audio.md)
-- Whether the output enable of Q7, the HPD buffer of `HDMI_IN`, floats when R299 (`/X`) is not
-  fitted. (hdmi.md)
+- Whether the I/O pull-ups are on during configuration. U13 (`PUDC_B`) has no external pull, so it
+  floats if nothing is on Arduino AR2. (headers.md)
+- Whether R299 is fitted. The HPD of `HDMI_IN` works in each test, so the owner thinks that R299
+  is fitted and that its `/X` is a mistake of the schematic. Not seen. (hdmi.md)
 
 ## Clocks, boot and PS
 
-- Whether a register write to the Ethernet PHY can stop `CLK125`. (clocks.md)
-- How the Zynq decodes the boot mode straps on MIO2 to MIO8. The decoding is in UG585, which is not
-  in `references/`. (boot.md)
-- What the bytes 0x10 to 0x13 of the OTP area of the QSPI flash are. They read 0xFF. The data
-  sheet of the S25FL128S is not in `references/`. (boot.md)
-- What the straps TXDLY, RXDLY, SELRGV, AN0 and AN1 of the RTL8211E select. Its datasheet is not in
-  `references/`. (ethernet.md)
-- The I2C address of the audio codec. The ADAU1761 datasheet is not in `references/`. (audio.md)
+- Whether a write of PHYCR bit 4 stops `CLK125` on the board, as the data sheet says. (clocks.md)
+- `BOOT_MODE` in the JTAG and QSPI positions of JP1 was not read. UG585 gives 0x0 and 0x1. (boot.md)
+- Which signal from the PL to the PS stops Linux when a bitstream without a PS7 cell is loaded.
+  CPU0 was in the FIQ handler. (vivado.md)
 
 ## Host side
 

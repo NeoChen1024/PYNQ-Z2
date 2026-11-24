@@ -117,7 +117,7 @@ The manual calls the headers "Arduino Shield compatible" **[manual]**. **[schema
 | Header | Part | Pins |
 |---|---|---|
 | J4 | 1x8 female | `AR0` to `AR7` on pins 1 to 8 |
-| J3 | 1x10 female | `AR8` to `AR13` on pins 1 to 6; ground (7); `A` (8); `AR_SCL` (9); `AR_SDA` (10) |
+| J3 | 1x10 female | `AR8` to `AR13` on pins 1 to 6; ground (7); `A` (8); SDA (9, net `AR_SCL`); SCL (10, net `AR_SDA`) |
 | J1 | 1x6 female | `A5` (1) to `A0` (6) |
 | J7 | 1x8 female | Power and reset, see below |
 | SPI_CNN1 | 2x3 header | `MISO` (1), `VCC3V3` (2), `SCK` (3), `MOSI` (4), `SS` (5), ground (6) |
@@ -138,17 +138,25 @@ board it is a digital I/O pin. The TUL XDC calls its port `a`, which cannot exis
 the bus `a[0..5]`. The master XDC calls it `ar_aref`.
 
 U13 (`AR_IO2`) is also the PUDC_B pin of the FPGA (`IO_L3P_T0_DQS_PUDC_B_34`). The schematic shows
-no resistor on it other than the 200 ohm to the header. See [unknowns.md](unknowns.md).
+no resistor on it other than the 200 ohm to the header. U13 has no external pull **[measured]**: it
+followed the internal pull of the PL in both pinprobe builds (2026-11-24). Thus PUDC_B floats during
+configuration if nothing is on AR2. See [unknowns.md](unknowns.md).
 
 T16 is `AR_IO10`; F16 is `AR_SS`. The board file of XilinxBoardStore 2025.2 and master gives the
 two pins the other way round; its 2022.2 branch agrees with the schematic (`pins.csv`).
 
 ### I2C
 
-`AR_SCL` (P16) and `AR_SDA` (P15) go to J3 without series resistors. R49 and R50 (2.2 kohm) pull
-them up to `VCC3V3` **[schematic] sheet 4**. Ports: `ar_scl`, `ar_sda`.
+The nets `AR_SCL` (P16) and `AR_SDA` (P15) go to J3 without series resistors. R49 and R50 (2.2 kohm)
+pull them up to `VCC3V3` **[schematic] sheet 4**.
 
-**The sources do not agree on which line is SDA.**
+**P16 is SDA and P15 is SCL** **[measured]**. On 2026-11-24, `tools/pinprobe/` watched all PL pins
+while the owner touched the J3 pin with the silkscreen SDA with a wire from GND, then the pin with
+the silkscreen SCL, two times. P16 went low for SDA, and P15 went low for SCL. The net names of the
+schematic are wrong. The master XDC follows the measurement: port `ar_sda` on P16 and `ar_scl` on
+P15.
+
+The sources:
 
 - The schematic and the TUL XDC: P15 is `AR_SDA` on J3.10; P16 is `AR_SCL` on J3.9.
 - The manual: J3.9 is `AR_SDA` on P16; J3.10 is `AR_SCL` on P15 **[manual]**.
@@ -156,7 +164,7 @@ them up to `VCC3V3` **[schematic] sheet 4**. Ports: `ar_scl`, `ar_sda`.
 
 All sources put P16 on J3.9 and P15 on J3.10. On an Arduino Uno R3, the pin next to AREF (J3.9) is
 SDA and the last pin (J3.10) is SCL. Thus a shield finds its SDA on P16, as the manual and the board
-file say. The net names of the schematic are the other way round. See [unknowns.md](unknowns.md).
+file say. The measurement agrees with this.
 
 ### SPI
 
@@ -240,7 +248,9 @@ The manual says that the 1 nF capacitor is fitted only on V_P/V_N **[manual]**. 
 - **Raspberry Pi pin table of the manual.** The manual gives other FPGA pins for RPi pins 7, 8, 10,
   18, 22, 26, 29 and 31 **[manual]**. For example it puts V6 on pin 7 and Y18 on pin 8. The
   schematic R12, the TUL XDC and the board file agree with each other and with the table above.
-  The revision history (sheet 2) records changes to the RPi header in revision B. The manual may
-  describe an earlier revision. Not measured.
+  The board agrees with them too **[measured]**: on 2026-11-24, a wire from GND on each of the eight
+  header pins pulled the FPGA pin of the table above low (`tools/pinprobe/`, GND tap). Thus the
+  manual table is wrong for this board. The revision history (sheet 2) records changes to the RPi
+  header in revision B; the manual may describe an earlier revision.
 - **The manual's PmodB table** gives `W156` for pin 8. The schematic gives W16.
-- **I2C of the Arduino header**: see above.
+- **I2C of the Arduino header**: the schematic net names and the TUL XDC are wrong; see above.

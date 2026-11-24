@@ -35,3 +35,7 @@ The upstream of this collection is [ZeroX29a/PynqZ2](https://github.com/ZeroX29a
   `pynq_z2_master.xdc` corrects these points: see `tools/tables.py`.
 - `tul/TUL_PYNQ_Schematic_R12.pdf` sheet 13 and `tul/pynqz2_user_manual_v1_0.pdf` give the DDR3
   part `MT41K512M16HA-125:A`. The board has `MT41K256M16TW-107:P`, by its marking (docs/ps.md).
+- `tul/TUL_PYNQ_Schematic_R12.pdf` sheet 4 and `tul/pynq-z2_v1.0.xdc` give `AR_SDA` on P15 and
+  `AR_SCL` on P16. On the board, P16 is SDA and P15 is SCL (docs/headers.md).
+- The Raspberry Pi pin table of `tul/pynqz2_user_manual_v1_0.pdf` is wrong for pins 7, 8, 10, 18,
+  22, 26, 29 and 31 (docs/headers.md).
