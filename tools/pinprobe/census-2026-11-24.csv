@@ -1,0 +1,126 @@
+# pinprobe read of all PL pins, 2026-11-24 (tools/pinprobe/). No cable on the headers and no display on HDMI_OUT; whether the HDMI source was on HDMI_IN at that time was not recorded. The port names are those of the master XDC before P15 and P16 were renamed (P16 is SDA).
+pin,port,pullup_build,pulldown_build,result
+M20,sw[0],0,0,low
+M19,sw[1],0,0,low
+L15,led4_b,0,0,low
+G17,led4_g,0,0,low
+N15,led4_r,0,0,low
+G14,led5_b,0,0,low
+L14,led5_g,0,0,low
+M15,led5_r,0,0,low
+R14,led[0],1,0,follows the pull
+P14,led[1],1,0,follows the pull
+N16,led[2],1,0,follows the pull
+M14,led[3],1,0,follows the pull
+D19,btn[0],1,0,follows the pull
+D20,btn[1],1,0,follows the pull
+L20,btn[2],1,0,follows the pull
+L19,btn[3],1,0,follows the pull
+Y18,ja[0]/rpio_04_r,1,0,follows the pull
+Y19,ja[1]/rpio_05_r,1,0,follows the pull
+Y16,ja[2]/rpio_sd_r,1,1,high
+Y17,ja[3]/rpio_sc_r,1,1,high
+U18,ja[4]/rpio_06_r,1,0,follows the pull
+U19,ja[5]/rpio_07_r,1,0,follows the pull
+W18,ja[6]/rpio_02_r,1,1,high
+W19,ja[7]/rpio_03_r,1,1,high
+W14,jb[0],1,0,follows the pull
+Y14,jb[1],1,0,follows the pull
+T11,jb[2],1,0,follows the pull
+T10,jb[3],1,0,follows the pull
+V16,jb[4],1,0,follows the pull
+W16,jb[5],1,0,follows the pull
+V12,jb[6],1,0,follows the pull
+W13,jb[7],1,0,follows the pull
+M17,adr0,1,1,high
+M18,adr1,1,1,high
+R18,au_bclk_r,1,0,follows the pull
+G18,au_din_r,1,0,follows the pull
+F17,au_dout_r,0,0,low
+U5,au_mclk_r,1,0,follows the pull
+U9,au_scl_r,1,1,high
+T9,au_sda_r,1,1,high
+T17,au_wclk_r,1,0,follows the pull
+D18,ar_an0_n,0,0,low
+E17,ar_an0_p,0,0,low
+E19,ar_an1_n,0,0,low
+E18,ar_an1_p,0,0,low
+J14,ar_an2_n,0,0,low
+K14,ar_an2_p,0,0,low
+J16,ar_an3_n,0,0,low
+K16,ar_an3_p,0,0,low
+H20,ar_an4_n,0,0,low
+J20,ar_an4_p,0,0,low
+G20,ar_an5_n,0,0,low
+G19,ar_an5_p,0,0,low
+T14,ar[0],1,0,follows the pull
+U12,ar[1],1,0,follows the pull
+U13,ar[2],1,0,follows the pull
+V13,ar[3],1,0,follows the pull
+V15,ar[4],1,0,follows the pull
+T15,ar[5],1,0,follows the pull
+R16,ar[6],1,0,follows the pull
+U17,ar[7],1,0,follows the pull
+V17,ar[8],1,0,follows the pull
+V18,ar[9],1,0,follows the pull
+T16,ar[10],1,0,follows the pull
+R17,ar[11],1,0,follows the pull
+P18,ar[12],1,0,follows the pull
+N17,ar[13],1,0,follows the pull
+Y13,ar_aref,1,0,follows the pull
+Y11,a[0],0,0,low
+Y12,a[1],0,0,low
+W11,a[2],0,0,low
+V11,a[3],0,0,low
+T5,a[4],0,0,low
+U10,a[5],0,0,low
+W15,ck_miso,1,0,follows the pull
+T12,ck_mosi,1,0,follows the pull
+H15,ck_sck,1,0,follows the pull
+F16,ck_ss,1,0,follows the pull
+P16,ar_scl,1,1,high
+P15,ar_sda,1,1,high
+F19,rpio_08_r,1,0,follows the pull
+V10,rpio_09_r,1,0,follows the pull
+V8,rpio_10_r,1,0,follows the pull
+W10,rpio_11_r,1,0,follows the pull
+B20,rpio_12_r,1,0,follows the pull
+W8,rpio_13_r,1,0,follows the pull
+V6,rpio_14_r,1,0,follows the pull
+Y6,rpio_15_r,1,0,follows the pull
+B19,rpio_16_r,1,0,follows the pull
+U7,rpio_17_r,1,0,follows the pull
+C20,rpio_18_r,1,0,follows the pull
+Y8,rpio_19_r,1,0,follows the pull
+A20,rpio_20_r,1,0,follows the pull
+Y9,rpio_21_r,1,0,follows the pull
+U8,rpio_22_r,1,0,follows the pull
+W6,rpio_23_r,1,0,follows the pull
+Y7,rpio_24_r,1,0,follows the pull
+F20,rpio_25_r,1,0,follows the pull
+W9,rpio_26_r,1,0,follows the pull
+V7,rpio_27_r,1,0,follows the pull
+H17,hdmi_rx_cec,1,0,follows the pull
+P19,hdmi_rx_clk_n,1,1,high
+N18,hdmi_rx_clk_p,1,1,high
+W20,hdmi_rx_d_n[0],1,1,high
+U20,hdmi_rx_d_n[1],1,1,high
+P20,hdmi_rx_d_n[2],1,1,high
+V20,hdmi_rx_d_p[0],1,1,high
+T20,hdmi_rx_d_p[1],1,1,high
+N20,hdmi_rx_d_p[2],1,1,high
+T19,hdmi_rx_hpd,1,0,follows the pull
+U14,hdmi_rx_scl,1,1,high
+U15,hdmi_rx_sda,1,1,high
+G15,hdmi_tx_cec,1,0,follows the pull
+L17,hdmi_tx_clk_n,1,1,high
+L16,hdmi_tx_clk_p,1,1,high
+K18,hdmi_tx_d_n[0],1,1,high
+J19,hdmi_tx_d_n[1],1,1,high
+H18,hdmi_tx_d_n[2],1,1,high
+K17,hdmi_tx_d_p[0],1,1,high
+K19,hdmi_tx_d_p[1],1,1,high
+J18,hdmi_tx_d_p[2],1,1,high
+R19,hdmi_tx_hpdn,1,1,high
+J15,crypto_sda,1,0,follows the pull
+V5,no_net,1,0,follows the pull

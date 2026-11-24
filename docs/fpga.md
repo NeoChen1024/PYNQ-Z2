@@ -65,6 +65,25 @@ The MIO pins and the DDR pins are not in the XDC. The PS7 configuration sets the
 The channel numbers come from the pin function names (`_ADnP`/`_ADnN`) on sheet 11. headers.md
 gives the analog front end of these inputs.
 
+## Pin census
+
+`tools/pinprobe/` reads the 123 PL pins with a net (all except `SYSCLK`) and V5 over JTAG. It is built twice: with the
+internal pull-up and with the internal pull-down of every pin. On 2026-11-24 **[measured]**
+(`tools/pinprobe/census-2026-11-24.csv`):
+
+| Result | Pins | Meaning |
+|---|---|---|
+| Follows the pull | 68 | No external level stronger than the internal pull |
+| High in both builds | 29 | A pull-up or a driver: the I2C lines, the HDMI TMDS termination, `ADR0`/`ADR1`, `HDMI_TX_HPDN` |
+| Low in both builds | 27 | A pull-down or a driver: the switches (down), the RGB LEDs, the Arduino analog pins, `AU_DOUT_R` |
+
+The internal pull of a 7-series I/O is weak. A path of 20 kohm to ground, as on each button
+(leds-buttons-switches.md), does not hold the pin low against the internal pull-up. Thus "follows
+the pull" means "nothing stronger than about 20 kohm". The pins that were compared with the
+schematic agree with it: the I2C pull-ups, the HDMI termination, the switches and the codec pins.
+The results also show that R180, R209 and V5 have no connection
+(audio.md, crypto.md).
+
 ## The schematic file
 
 The file is `references/tul/TUL_PYNQ_Schematic_R12.pdf`. Its PDF title is `tul_pynq_r11_0109`, and

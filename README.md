@@ -66,6 +66,7 @@ Read these points before you use the board:
 | `jtag/load.sh`, `jtag/load.tcl` | Load a bitstream into the PL over the USB-JTAG. They do not touch the flash or a card |
 | `jtag/boot.sh`, `jtag/boot.tcl` | Boot the PS over JTAG with `xsdb`: `ps7_init`, an optional bitstream, data files and an ELF program |
 | `examples/pl-blinky/` | The smallest PL design: SYSCLK, the switches, the buttons and the LEDs |
+| `tools/pinprobe/` | A JTAG instrument in the PL: reads every PL pin with pull-ups or pull-downs, watches pins, scans the codec I2C bus, drives the HPD of `HDMI_IN`. `census-2026-11-24.csv` is its first result |
 | `linux/` | U-Boot, Linux 6.18 and Alpine Linux on F2FS: see [linux/README.md](linux/README.md) |
 | `board-files/` | The Vivado board files, a copy of XilinxBoardStore: see [board-files/README.md](board-files/README.md) |
 | `references/` | The schematic, the manual, the TUL XDC and PS7 preset, AMD documents and the Zynq Book: see [references/README.md](references/README.md) |
@@ -84,7 +85,7 @@ sh $P/examples/pl-blinky/build.sh                       # into ./pynq-blinky
 sh $P/jtag/load.sh pynq-blinky/build/blinky.bit         # loads the PL; no flash or card is touched
 ```
 
-Vivado needs the Zynq-7000 devices. On 2026-11-23 the build ran with Vivado 2025.2.1: setup slack
+Vivado needs the Zynq-7000 devices. On 2026-11-24 the build ran with Vivado 2025.2.1: setup slack
 +5.370 ns, hold slack +0.252 ns, 3 LUT and 30 FF. On 2026-11-24 the load ran on the board, and the
 LEDs, the buttons and the switches did what `blinky.sv` describes.
 

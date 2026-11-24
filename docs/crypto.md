@@ -18,8 +18,9 @@ ATSHA204A data sheet describes that interface. It is not in this repository.
 
 **U14 is not fitted.** The owner saw its footprint empty on 2026-11-24. The schematic marks U14,
 R208 and R209 with `/X`. The manual does not name the chip **[manual]**. Thus `crypto_sda` (J15)
-connects only to the footprint, and to R209 if R209 is fitted. A design must not expect a device
-on it.
+connects only to the footprint. R209 is not fitted either **[measured]**: J15 followed the internal
+pull of the PL in both pinprobe builds (2026-11-24); with the 1.2 kohm pull-up of R209 it would read
+high in both. A design must not expect a device on J15.
 
 The TUL XDC has the port `crypto_sda` (section "Crypto SDA"). The board file has no interface for
 the chip.

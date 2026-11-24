@@ -32,12 +32,20 @@ pin. See [ps.md](ps.md).
 **[schematic] sheets 6, 11**:
 
 - **TMDS termination.** R321 to R328 (49.9 ohm) pull each of the eight lines up to `VCC3V3`, near
-  the FPGA (sheet 11). Sheet 6 also has 150 ohm pull-ups R139 to R146, marked `/X`.
+  the FPGA (sheet 11). Sheet 6 also has 150 ohm pull-ups R139 to R146, marked `/X`. A photo of
+  the board (2026-11-24) shows eight empty two-pad footprints beside the signal pins of the
+  `HDMI_IN` connector. The silkscreen gives no part names, so that these are R139 to R146 is
+  probable, not certain.
 - **5 V.** Pin 18 of the connector is `HDMI_RX_5V0`, which the source supplies. Only the HPD buffer
   and the DDC level translator use it. It does not feed the board.
 - **HPD.** The PL drives `HDMI_RX_HPD` (T19). Q7, a `NC7SZ125M5X` buffer on `HDMI_RX_5V0`, drives pin
   19 through R138 (1 kohm). Thus HPD can go high only while a source supplies 5 V. The output
-  enable (Q7.1) goes to ground through R299, which is marked `/X`. See [unknowns.md](unknowns.md).
+  enable (Q7.1) goes to ground through R299, which is marked `/X`. Whether R299 is fitted is not
+  known, but the HPD works **[measured]**: on 2026-11-24, an HDMI source (a PC graphics card) on
+  `HDMI_IN` read the DDC within 1 s after each change of T19, five times; without a change of T19,
+  the DDC stayed quiet for 20 s (`tools/pinprobe/`, `watch` with `hpd0`/`hpd1`). The source then
+  reported no display, because no EDID answered. Because the HPD worked in each test, the owner
+  thinks that R299 is fitted and that its `/X` is a mistake. The part was not seen.
 - **DDC.** U7, a `GTL2002` level translator (marking `NXP_GTL2002GM`), connects `HDMI_RX_SCL` and
   `HDMI_RX_SDA` to pins 15 and 16. R150 and R151 (1 kohm) pull up the PL side to `VCC3V3`. R148 and
   R149 (1.5 kohm) pull up the connector side to `HDMI_RX_5V0`. The PL must answer as the EDID
