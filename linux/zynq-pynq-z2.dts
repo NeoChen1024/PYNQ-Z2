@@ -144,5 +144,9 @@
 &usb0 {
 	status = "okay";
 	dr_mode = "host";	/* type-A receptacle, ID on GND (docs/usb.md) */
-	usb-phy = <&usb_phy0>;
+	/*
+	 * "phys", not the old "usb-phy": the ChipIdea driver looks up only "phys", and defers until the
+	 * PHY exists. With "usb-phy", it probed before usb_phy0 and failed silently (-ENXIO, 2026-11-24).
+	 */
+	phys = <&usb_phy0>;
 };

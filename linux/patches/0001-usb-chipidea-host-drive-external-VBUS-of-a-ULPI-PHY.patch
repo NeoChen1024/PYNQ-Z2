@@ -1,0 +1,44 @@
+From: PYNQ-Z2 board notes
+Subject: [PATCH] usb: chipidea: host: drive external VBUS of a ULPI PHY
+
+The Zynq-7000 USB controllers (CI_HDRC_PHY_VBUS_CONTROL) leave VBUS to the
+PHY. On boards with a ULPI PHY such as the TUSB1210 and an external VBUS
+switch on its CPEN pin, the PHY drives CPEN only if DrvVbusExternal is set
+in its OTG Control register. With usb-nop-xceiv as the PHY, nothing sets
+that bit, so VBUS stays off and no device is detected.
+
+Set DrvVbus and DrvVbusExternal through the ULPI viewport when the port
+power changes.
+
+Tested on a TUL PYNQ-Z2 (TUSB1210, TPS2065 VBUS switch) with Linux 6.18.64.
+---
+--- a/drivers/usb/chipidea/host.c
++++ b/drivers/usb/chipidea/host.c
+@@ -15,6 +15,7 @@
+ #include <linux/regulator/consumer.h>
+ #include <linux/string_choices.h>
+ #include <linux/pinctrl/consumer.h>
++#include <linux/ulpi/regs.h>
+ 
+ #include "../host/ehci.h"
+ 
+@@ -68,6 +69,19 @@
+ 			usb_phy_vbus_on(ci->usb_phy);
+ 		else
+ 			usb_phy_vbus_off(ci->usb_phy);
++
++		/*
++		 * A ULPI PHY that switches VBUS with an external supply needs
++		 * DrvVbusExternal in its OTG Control register. A legacy PHY
++		 * such as usb-nop-xceiv does not set it, so set both VBUS bits
++		 * here through the ULPI viewport.
++		 */
++		if (ci->ulpi)
++			ci->ulpi_ops.write(ci->dev,
++					   enable ? ULPI_SET(ULPI_OTG_CTRL) :
++						    ULPI_CLR(ULPI_OTG_CTRL),
++					   ULPI_OTG_CTRL_DRVVBUS |
++					   ULPI_OTG_CTRL_DRVVBUS_EXT);
+ 	}
+ 
+ 	if (enable && (ci->platdata->phy_mode == USBPHY_INTERFACE_MODE_HSIC)) {

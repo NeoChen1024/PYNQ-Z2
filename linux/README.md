@@ -3,14 +3,23 @@
 The PS boots U-Boot SPL, U-Boot and a mainline kernel, with an Alpine Linux root file system on F2FS
 on the card. No Vitis FSBL and no PetaLinux are used. The PL is free for the designs of the user.
 
-**Status:** nothing of this has run on a board yet. On 2026-11-23 `ps7/build.sh` (Vivado 2025.2.1)
-exported the PS7 configuration of the board preset, and `build-uboot.sh` built the SPL with it.
+**Status:** the system runs on the board **[measured]**. On 2026-11-24, the card image of
+`mkdisk.sh` booted from a 64 GB microSD card (JP1 in the SD position) to the login prompt:
 
-On 2026-11-23 the kernel, the device tree and the root file system booted in QEMU (`qemu.sh`, QEMU
-machine `xilinx-zynq-a9`) to the login prompt. In QEMU, the root F2FS mounted, mdev loaded
-`i2c_gpio`, the QSPI flash showed as the read-only `mtd0`, sshd and chronyd started, and `poweroff`
-halted the system. QEMU is not the board: its Ethernet PHY and the GPIO of the MIO do not behave
-as on the board, and U-Boot SPL was not run.
+- The boot ROM loaded U-Boot SPL from `BOOT.BIN`. The SPL ran `ps7_init` and loaded `u-boot.img`.
+- U-Boot found 512 MiB of DRAM, read `extlinux.conf` and started the kernel.
+- The kernel mounted the root F2FS. OpenRC started mdev, the network, chronyd and sshd.
+- `eth0` linked at 1000 Mb/s full duplex. DHCP, NTP and SSH worked, with 0 receive and 0 transmit
+  errors.
+- The card ran in SD High Speed mode, 50 MHz, 4 bits. A read of 256 MiB of `mmcblk0p2` with
+  `dd bs=1M iflag=direct` took 12.6 s: 20.3 MB/s. The card was a 64 GB card, `SB64G`.
+- cpufreq (`ondemand`) used both operating points, 650 MHz and 325 MHz.
+- The QSPI flash showed as the read-only `mtd0` (16 MiB).
+- The USB host found a USB flash drive at boot (`usb-storage`), with the patch of `patches/`
+  (see below).
+
+Before the board, the system booted in QEMU (`qemu.sh`, QEMU machine `xilinx-zynq-a9`) on
+2026-11-23. `qemu.sh` stays for tests of the kernel and the root file system without the board.
 
 | Part | Version | Source |
 |---|---|---|
@@ -18,8 +27,9 @@ as on the board, and U-Boot SPL was not run.
 | Linux | 6.18.64 (longterm) | <https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.18.64.tar.xz> |
 | Alpine Linux | 3.24.4, armv7 | The `alpine:3.24.4` container and <https://dl-cdn.alpinelinux.org/alpine/v3.24/> |
 
-The sources stay outside the repository. The build scripts add only `zynq-pynq-z2.dts` and its line
-in the Makefile of the device trees to each source tree.
+The sources stay outside the repository. The build scripts add `zynq-pynq-z2.dts` and its line in
+the Makefile of the device trees to each source tree. `build-kernel.sh` also applies the patches of
+`patches/` to the Linux tree.
 
 ## Files
 
@@ -27,6 +37,7 @@ in the Makefile of the device trees to each source tree.
 |---|---|
 | `zynq-pynq-z2.dts` | The device tree of the board, for U-Boot and Linux: UART0, GEM0 with the PHY at MDIO address 1, SDIO0, USB0 as host, the QSPI flash (read-only), the HDMI output DDC on MIO50/51 |
 | `pynq-z2.config` | The kernel configuration fragment, on top of `multi_v7_defconfig` |
+| `patches/` | Patches to Linux, applied by `build-kernel.sh` (GPL-2.0, as Linux) |
 | `build-kernel.sh` | Builds `zImage`, the device tree and the modules with clang (`LLVM=1`) |
 | `build-uboot.sh` | Builds `boot.bin` (the SPL with the boot header), `u-boot.img` and `u-boot.elf` with `arm-none-eabi-gcc` |
 | `mkrootfs.sh` | Makes `rootfs.f2fs` in an armv7 Alpine container |
@@ -71,13 +82,27 @@ without a card in the boot path.
 - `i2c-gpio` (the HDMI output DDC) is a module. If SCL stays low, its probe waits for about 18 s; in
   QEMU it held the boot for that time while it was built in.
 
-## Not yet confirmed
+## USB host
 
-These choices follow the documents and must be checked on the board:
+Mainline Linux 6.18 does not turn on the VBUS of the USB port of this board. Two changes make the
+port work **[measured]** 2026-11-24:
 
-- `phy-mode = "rgmii-id"`, which assumes that the TXDLY and RXDLY straps of the RTL8211E add the
-  delays (docs/ethernet.md).
-- The card detect on MIO47: its polarity is not known (docs/sd-card.md).
-- The reset of the USB PHY on MIO46 and the reset of the Ethernet PHY on MIO9 (`reset-gpios`).
-- Whether cpufreq changes the CPU between 650 MHz and 325 MHz on the board. In QEMU it changed from
-  250 MHz (the start frequency of QEMU) to 325 MHz.
+- The USB0 node uses `phys`, not the old `usb-phy`. The ChipIdea driver looks up only `phys`. With
+  `usb-phy`, it probed before the PHY driver, failed with `-ENXIO` and printed no message.
+- `patches/0001-usb-chipidea-host-drive-external-VBUS-of-a-ULPI-PHY.patch` sets `DrvVbus` and
+  `DrvVbusExternal` in the OTG Control register of the ULPI PHY when the port power changes.
+
+The TUSB1210 drives `CPEN`, the enable of the VBUS switch U10, only with `DrvVbusExternal` set
+(docs/usb.md). `usb-nop-xceiv` does not set it, and the TUSB1210 PHY driver of Linux does not
+connect to the ChipIdea driver. Without the patch, the controller runs, but VBUS stays off and the
+port finds no device.
+
+## Checked on the board
+
+These choices followed the documents. The boot of 2026-11-24 confirmed them **[measured]**:
+
+- `phy-mode = "rgmii-id"`: the link ran at 1000 Mb/s with traffic and no errors (docs/ethernet.md).
+- The card detect on MIO47 without `cd-inverted`: U-Boot found no card in an empty slot, and found
+  the card when it was in the slot (docs/sd-card.md).
+- The PHY resets on MIO9 and MIO46 (`reset-gpios`): both PHYs worked after Linux released them.
+- The operating points 650 MHz and 325 MHz: cpufreq changed between them.

@@ -28,11 +28,26 @@ U10, marked `TPS2065DB`, switches `VCC5V0` to `USB_OTG_VBUS` on the connector **
 sheet 7:
 
 - Its enable is `CPEN` of U9, with a 4.7 kΩ pull-down (R175). The USB controller turns VBUS on
-  through the PHY.
+  through the PHY. The PHY drives `CPEN` only if software sets `DrvVbusExternal` (bit 6) in its OTG
+  Control register (ULPI address 0x0A) **[measured]**. On 2026-11-24, the OTG Control register
+  read 0x27 after Linux started the host: `DrvVbus` set, `DrvVbusExternal` clear. VBUS was off, and
+  the port found no device. A write of 0x40 to address 0x0B (the set address of OTG Control) turned
+  VBUS on, and the controller found the USB device at once.
 - Its over-current output `OC#` is `OTG_OC` on MIO11. The board preset sets MIO11 as GPIO.
 - `USB_OTG_VBUS` also goes to the `VBUS` pin of U9.
 
 The current limit of U10 is in its datasheet, which is not in `references/`.
+
+## Test on the board
+
+On 2026-11-24 **[measured]**:
+
+- The ULPI registers 0 to 3 of U9 read 0x51, 0x04, 0x07, 0x15: vendor 0x0451 (TI), product 0x1507.
+- Linux 6.18.64 with the changes of linux/README.md ("USB host") found a USB flash drive at boot.
+  It was a full-speed device (`wch.cn USB-Mini-Disk`, 256 KiB), and two reads of the whole device
+  gave the same MD5 sum.
+- A high-speed device was not tested. The current limit and the over-current flag on MIO11 were not
+  tested.
 
 ## Mode
 

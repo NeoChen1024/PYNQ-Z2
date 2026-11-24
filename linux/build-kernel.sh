@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 # Builds Linux for the PYNQ-Z2 with clang (LLVM=1, so no ARM gcc is needed): multi_v7_defconfig with
-# pynq-z2.config, and zynq-pynq-z2.dts. The source tree gets only the device tree and its line in
-# the Makefile; the objects go to WORK.
+# pynq-z2.config, zynq-pynq-z2.dts and the patches of patches/. The source tree gets the device tree,
+# its line in the Makefile and the patches; the objects go to WORK.
 #
 #   [WORK=dir] sh build-kernel.sh /path/to/linux-6.18
 #
@@ -19,6 +19,13 @@ dts="$src/arch/arm/boot/dts/xilinx"
 install -m 644 "$here/zynq-pynq-z2.dts" "$dts/zynq-pynq-z2.dts"
 grep -q 'zynq-pynq-z2.dtb' "$dts/Makefile" || sed -i 's/^\(\s*\)zynq-zybo-z7.dtb/\1zynq-pynq-z2.dtb \\\n\1zynq-zybo-z7.dtb/' "$dts/Makefile"
 grep -q 'zynq-pynq-z2.dtb' "$dts/Makefile" || { echo "could not add the dtb to $dts/Makefile" >&2; exit 1; }
+
+# A patch that reverses cleanly is in the tree already.
+for p in "$here"/patches/*.patch; do
+    [ -e "$p" ] || continue
+    patch -d "$src" -p1 -R -s -f --dry-run <"$p" >/dev/null 2>&1 && continue
+    patch -d "$src" -p1 -s -f <"$p" >/dev/null || { echo "could not apply $p" >&2; exit 1; }
+done
 
 k="$work/kbuild"
 mk() { make -C "$src" O="$k" ARCH=arm LLVM=1 -j"$(nproc)" "$@"; }
