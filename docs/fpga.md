@@ -11,6 +11,8 @@ sheets 9 to 12. The Vivado part is `xc7z020clg400-1`.
 | CPU clock of the board preset | 650 MHz | Board file `preset.xml` (`PCW_APU_PERIPHERAL_FREQMHZ`) |
 | CPU clock limit of a -1 part | 667 MHz (6:2:1 clock ratio) | Data sheet DS187, `FCPU_6X4X_621_MAX` |
 | PL | 13,300 slices, 220 DSP slices, 630 KB block RAM | **[manual]** |
+| JTAG IDCODE | 0x23727093 (`xc7z020`), and 0x4BA00477 for the `arm_dap` | **[measured]** 2026-11-24, `xsdb` `jtag targets` |
+| PS version | 0x23727093 in `PSS_IDCODE` (0xF8000530); U-Boot prints `Silicon: v3.1` | **[measured]** 2026-11-24 |
 
 The designs here are built as -1. No measurement on this board shows a faster grade.
 

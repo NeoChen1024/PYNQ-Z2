@@ -103,7 +103,8 @@ Notes on the table:
 
 **[schematic]** sheets 10 and 13:
 
-- One DDR3 device, IC1, marked `MT41K512M16HA-125:A` in a 96-ball FBGA. The PS uses `DQ0` to
+- One DDR3 device, IC1, in a 96-ball FBGA. The schematic gives `MT41K512M16HA-125:A`; the fitted
+  part is `MT41K256M16TW-107:P` (see below). The PS uses `DQ0` to
   `DQ15`, `DM0`/`DM1` and `DQS0`/`DQS1`. `DQ16` to `DQ31`, `DM2`/`DM3` and `DQS2`/`DQS3` have no
   net. The bus is 16 bits wide.
 - Address `A0` to `A14` and `BA0` to `BA2` connect. `A15` (ball M7) of IC1 has no net. The PS has no
@@ -115,24 +116,54 @@ Notes on the table:
   (1 kΩ each). It goes to `VREFCA`/`VREFDQ` of IC1 and to `PS_DDR_VREF0`/`VREF1` (H6, P6).
 - `PS_DDR_VRP` (H5) has 80.6 Ω (R219) to GND, and `PS_DDR_VRN` (G5) has 80.6 Ω (R220) to `VCC1V5`.
 
-The three sources do not agree on the part:
+The documents do not agree on the part. The marking shows the fitted part:
 
 | Source | Part | Size |
 |---|---|---|
 | **[schematic]** sheet 13 | `MT41K512M16HA-125:A` | Not given. In the naming of Micron the number reads as 512M x 16 |
 | **[manual]** | "Micron 256Mx16 (MT41K512M16HA-125:A)" | 512 MB, 16 bits, up to 1050 Mb/s |
 | `preset.xml` | `MT41J256M16 RE-125`: 4096 Mbit, 15 row bits, 10 column bits, 3 bank bits | 512 MiB (`PCW_DDR_RAM_HIGHADDR` 0x1FFFFFFF) |
+| The marking of IC1, seen by the owner on 2026-11-24 | `3MP17`, `D9SHD`. The Micron FBGA decoder gives `MT41K256M16TW-107:P` for `D9SHD` | 4 Gbit, 256M x 16: 512 MiB |
 
-Without `A15`, the controller can address 512 MiB of any of these parts. The marking of the fitted
-chip was not read (unknowns.md).
+The fitted part is `MT41K256M16TW-107:P`. The record follows the marking. The schematic is wrong,
+and the manual gives the correct organization with the part number of the schematic.
+
+The data sheet of the part is `references/micron/MT41K_DDR3L_4Gb_Rev.Q_Dec2017_DS.pdf` (pages 1
+and 2):
+
+- It is a DDR3L device: VDD and VDDQ are 1.35 V. It also operates at 1.5 V ±0.075 V, as DDR3. The
+  board supplies 1.5 V (`VCC1V5`), so the part runs in its 1.5 V mode. For that mode the data sheet
+  refers to the DDR3 (1.5 V) data sheet of die revision E, which is not in `references/`.
+- `256M16` is 32 Meg x 16 x 8 banks: 15 row address bits (`A0` to `A14`), 10 column address bits,
+  3 bank address bits, 2 KB page. This is the geometry that `preset.xml` sets.
+- `TW` is the 96-ball FBGA of 8 mm x 14 mm. `-107` is DDR3-1866 (tCK 1.07 ns, CL 13). It is also
+  correct for DDR3-1600 with CL 11.
+- No temperature mark means the commercial range, 0 °C to 95 °C case temperature. `:P` is the
+  revision.
+
+The part uses `A0` to `A14` only, and the PS has no `A15`. U-Boot found 512 MiB, and the memory test passed (see
+below). The board preset runs the part far below its rating: 1050 Mb/s.
 
 The board preset runs the DDR at 525 MHz (1050 Mb/s), CL 7, CWL 6, with write leveling, read gate
 and data eye training. Its four `PCW_UIPARAM_DDR_DQS_TO_CLK_DELAY` values are negative (-0.051,
 -0.006, -0.009 and -0.033 ns). Vivado 2025.2.1 gives a critical warning for each of them when
 `ps7/build.sh` applies the preset (2026-11-23): it says that negative DQS skew values can make the
-DDR fail. Whether the DDR is reliable with these values is not known (unknowns.md). It has the board delays for each byte lane (`PCW_UIPARAM_DDR_BOARD_DELAY0`
+DDR fail. It has the board delays for each byte lane (`PCW_UIPARAM_DDR_BOARD_DELAY0`
 to `3`, `PCW_UIPARAM_DDR_DQS_TO_CLK_DELAY_0` to `3`). The manual says that TUL calculated them from
 the PCB trace lengths. The data sheet DS187 gives 1066 Mb/s as the DDR3 limit of the XC7Z020.
+
+### DDR test
+
+On 2026-11-24, the DDR passed one memory test with the board preset **[measured]**:
+
+- `jtag/boot.sh` ran `ps7_init.tcl` of `ps7/build.sh` and started U-Boot 2026.10 (`linux/build-uboot.sh`).
+- U-Boot ran `mtest 0x00100000 0x1d000000 0 1`: 463 MiB, one iteration, 12 minutes. It found 0 errors.
+- The test is the alternative test of U-Boot with the bit-flip test (`CONFIG_SYS_ALT_MEMTEST`,
+  `CONFIG_SYS_ALT_MEMTEST_BITFLIP`). The data cache was on.
+- The range stops below the relocated U-Boot. The first 1 MiB was not tested.
+
+This is one pass on one board, at a temperature that was not measured. It does not show the timing
+margin of the negative DQS-to-CLK delays (unknowns.md).
 
 ## PS resets
 
@@ -159,3 +190,8 @@ not read the boot straps again. The PROG1 button resets only the PL (boot.md).
 | Ethernet 0 | 1000 Mb/s (125 MHz) | `PCW_ENET0_PERIPHERAL_FREQMHZ` |
 
 The input of all of them is the 50 MHz `PS_CLK` (clocks.md).
+
+On 2026-11-24, U-Boot `clk dump` after `ps7_init` showed the same values **[measured]**: ARM PLL
+1300 MHz, CPU 650 MHz, DDR 525 MHz, `FCLK0` 100 MHz, LQSPI 200 MHz, SDIO0 50 MHz, UART0 100 MHz and
+GEM0 125 MHz. U-Boot calculates them from the clock registers of the PS. No instrument measured
+them. `bdinfo` showed 512 MiB of DRAM.

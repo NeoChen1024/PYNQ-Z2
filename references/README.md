@@ -1,7 +1,7 @@
 # References
 
 The documents of this directory are third-party material. They are here because their links on the
-sites of AMD and TUL stopped working. Each file is as it was downloaded; a new revision is a new
+sites of AMD and TUL stopped working, or because the record cites them and a link can stop working. Each file is as it was downloaded; a new revision is a new
 file. The documents of `docs/` cite these files and state their facts in their own words.
 
 The rights stay with the publisher of each document. The MIT License of this repository does not
@@ -15,6 +15,7 @@ apply to them.
 | `tul/pynq-z2_v1.0_ps7_preset.tcl` | PS7 preset for the `processing_system7` IP, v1.0 (original name `PYNQ-Z2 v1.0.tcl`) | TUL Corporation | `1ebb6c4b332cb7f5f925488e6bce6aa2ce683469d0af7a4a34d6278cbbc6b6f2` |
 | `amd/ds187-XC7Z010-XC7Z020-Data-Sheet.pdf` | DS187 v1.21 (2020-12-01), Zynq-7000 SoC DC and AC Switching Characteristics | Xilinx (AMD) | `61e245380c01d2b9cc1350d529265d185e04c1c0379b0fdb3adcba76585c8dac` |
 | `amd/Zynq-7000_Xilinx_Wiki.pdf` | The Zynq-7000 pages of the Xilinx Wiki, exported 2024-01-04 | Xilinx (AMD) | `a4837b36df74949f389364c054d5e6533d815ed5cf610d0fd9dd51d07ef49453` |
+| `micron/MT41K_DDR3L_4Gb_Rev.Q_Dec2017_DS.pdf` | 4Gb: x4, x8, x16 DDR3L SDRAM (MT41K1G4, MT41K512M8, MT41K256M16), data sheet Rev. Q 12/17, from micron.com | Micron Technology | `3b0a5ce422db7f8edaa2a44e389c03fc175b28a253acd2eed799016cbdd622e8` |
 | `zynq-book/The_Zynq_Book_ebook_3.pdf` | L. H. Crockett, R. A. Elliot, M. A. Enderwitz, R. W. Stewart: The Zynq Book, 1st edition, 2014 ([zynqbook.com](http://www.zynqbook.com/)) | Strathclyde Academic Media | `c565a4d7c41226a5a43161e2cb0da27c2d2a18a1bc6799dfd273655bc2eeb5cb` |
 | `pinout/pinout.svg`, `pinout/pinout.png` | Pinout diagram of the board headers, by eneriz-daniel ([PYNQ forum](https://discuss.pynq.io/t/pynq-z2-pinout/4256/5)) | eneriz-daniel | svg `13d94bfca13524d88cf1eafa8eecc199d337d10a7c81fbc973e5d97bf094c965`, png `eb54515266215e0234b18f0b2eede0189d85dd9049babf8fc6d00854aa4e9b99` |
 
@@ -27,3 +28,5 @@ The upstream of this collection is [ZeroX29a/PynqZ2](https://github.com/ZeroX29a
 - `tul/pynq-z2_v1.0.xdc` does not have the pin V7 (Raspberry Pi GPIO27). Its port `a` collides with
   its bus `a[0..5]`. Ten of its comments give a wrong function name for the pin.
   `pynq_z2_master.xdc` corrects these points: see `tools/tables.py`.
+- `tul/TUL_PYNQ_Schematic_R12.pdf` sheet 13 and `tul/pynqz2_user_manual_v1_0.pdf` give the DDR3
+  part `MT41K512M16HA-125:A`. The board has `MT41K256M16TW-107:P`, by its marking (docs/ps.md).

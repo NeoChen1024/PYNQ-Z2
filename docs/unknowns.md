@@ -10,12 +10,9 @@ question removes it here and updates that document.
 - What `/X` on the schematic means. The record assumes "not fitted". It applies to U14, R208, R209,
   R139 to R146, R299, JP2, JP3, J13, J14 and C19. (crypto.md, hdmi.md, jtag-uart.md, power.md)
 - Whether U14, the ATSHA204A crypto chip, is fitted. (crypto.md)
-- Which DDR3 chip is fitted. The schematic marks `MT41K512M16HA-125:A` (512M x 16), the manual says
-  256M x 16, and `preset.xml` uses `MT41J256M16 RE-125`. The marking on the board was not read.
-  (ps.md)
 - The power-up order of the four outputs of the TPS65400. (power.md)
-- Whether the DDR3 works reliably with the negative DQS-to-CLK delays of the board preset, about
-  which Vivado warns. (ps.md)
+- How much timing margin the DDR3 has with the negative DQS-to-CLK delays of the board preset,
+  about which Vivado warns. One pass of a memory test found no error. (ps.md)
 
 ## Pins and headers
 
@@ -34,20 +31,16 @@ question removes it here and updates that document.
 
 ## Clocks, boot and PS
 
-- Whether `CLK125` of the Ethernet PHY runs with the default settings of the PHY, and whether
-  software can stop it. (clocks.md)
+- Whether a register write to the Ethernet PHY can stop `CLK125`. (clocks.md)
 - How the Zynq decodes the boot mode straps on MIO2 to MIO8. The decoding is in UG585, which is not
   in `references/`. (boot.md)
-- The MDIO address 1 and the MAC address in the OTP come from the manual only. They were not read on
-  the board. (ethernet.md, boot.md)
+- The MAC address in the OTP of the QSPI flash comes from the manual only. It was not read on the
+  board. (ethernet.md, boot.md)
 - What the straps TXDLY, RXDLY, SELRGV, AN0 and AN1 of the RTL8211E select. Its datasheet is not in
   `references/`. (ethernet.md)
-- The polarity of the card-detect switch of SD1. Its other contact is not on the sheet.
-  (sd-card.md)
 - The I2C address of the audio codec. The ADAU1761 datasheet is not in `references/`. (audio.md)
 
 ## Host side
 
-- Whether Vivado `hw_server` and openFPGALoader find the FT2232H without setup, and what its
-  93AA56B EEPROM holds. (jtag-uart.md)
-- Which `ttyUSB` number the PS UART gets on a Linux host. (jtag-uart.md)
+- Whether openFPGALoader finds the FT2232H without setup, and what else its 93AA56B EEPROM holds.
+  (jtag-uart.md)

@@ -26,8 +26,10 @@ PHY is in reset and `CLK125` stops **[manual]**.
   PHY (the FSBL, U-Boot or Linux) stops `SYSCLK` for the time of the reset.
 - A PL design that uses `SYSCLK` must not depend on it while the PS resets the PHY. If the design
   needs a clock that never stops, use `FCLK_CLK0` of the PS.
-- Whether the PHY gives `CLK125` with its default settings, and whether a register write can stop
-  it, is not measured (unknowns.md).
+- The PHY gives `CLK125` with its default settings **[measured]**. On 2026-11-24, pl-blinky
+  counted on LD0 to LD3 from `SYSCLK`. No software had initialized the PS or the PHY. The frequency
+  was not measured.
+- Whether a register write to the PHY can stop `CLK125` is not known (unknowns.md).
 
 The master XDC has the clock constraint for it: `create_clock -period 8.00` on `sysclk`.
 

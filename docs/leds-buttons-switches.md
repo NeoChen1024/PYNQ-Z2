@@ -78,3 +78,15 @@ position gives a high level **[manual]**.
 The board also has the buttons SRST1 (system reset of the PS) and PROG1 (`PROGRAM_B` of the PL)
 **[schematic] sheets 9, 10**. They do not go to user PL pins. See [boot.md](boot.md). SRST1 also
 pulls `AR_RST` of the Arduino header low ([headers.md](headers.md)).
+
+## Test on the board
+
+On 2026-11-24, `examples/pl-blinky` ran on the board, loaded over JTAG **[measured]**. The owner
+saw this:
+
+- LD0 to LD3 counted, with LD0 the fastest.
+- SW0 made the count slower, and SW1 inverted the four LEDs.
+- BTN0, BTN1 and BTN2 lit red, green and blue of LD4. BTN3 lit red of LD5.
+
+Thus the pins and the polarities of the tables above are correct for these parts. The green and
+blue colors of LD5 were not tested.

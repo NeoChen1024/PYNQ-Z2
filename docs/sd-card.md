@@ -32,8 +32,18 @@ limit that the manual gives.
 
 The `Del_SW` contact of the socket (pin 9) goes through R134 (200 Ω) to `SD_CD` on MIO47. R133
 (47 kΩ) pulls `SD_CD` up to `VCC1V8` **[schematic]** sheet 5. The other contact of the switch is not
-on the sheet. Thus the level with a card in the socket was not found from the schematic
-(unknowns.md).
+on the sheet.
+
+The card detect works with the default polarity of the controller **[measured]**. On 2026-11-24,
+U-Boot reported no card while the slot was empty, and found the card while it was in the slot.
+Linux also found the card without `cd-inverted` in the device tree. The voltage on MIO47 was not
+measured.
+
+## Test on the board
+
+On 2026-11-24, Linux ran the card in SD High Speed mode: 50 MHz, 4 bits, 3.3 V signal level
+**[measured]**. A read of 256 MiB with `dd bs=1M iflag=direct` gave 20.3 MB/s. The card was a 64
+GB SDXC card that reported the name `SB64G`. The figure applies to that card only.
 
 ## Use
 

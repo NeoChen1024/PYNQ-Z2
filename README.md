@@ -29,7 +29,7 @@ If no source says something, the text says that it is not known.
 | Clocks | 50 MHz `PS_CLK`; 125 MHz `SYSCLK` on H16 comes from the Ethernet PHY | [docs/clocks.md](docs/clocks.md) |
 | Boot | JP1 selects JTAG, QSPI or SD boot; a Quad SPI flash on MIO1 to MIO6 | [docs/boot.md](docs/boot.md) |
 | JTAG and UART | One micro-USB (FT2232H) gives the JTAG and the PS UART on MIO14/15 | [docs/jtag-uart.md](docs/jtag-uart.md) |
-| PS | The MIO table, 512 MiB of DDR3 on 16 bits, the two PS7 presets | [docs/ps.md](docs/ps.md) |
+| PS | The MIO table, 512 MiB of DDR3 on 16 bits (a DDR3L part at 1.5 V), the two PS7 presets | [docs/ps.md](docs/ps.md) |
 | Ethernet | Gigabit, RTL8211E-VL on GEM0 (RGMII, MIO16 to MIO27) | [docs/ethernet.md](docs/ethernet.md) |
 | USB | Host port on USB0 through a TUSB1210 ULPI PHY | [docs/usb.md](docs/usb.md) |
 | SD card | microSD on SDIO0 (MIO40 to MIO47) through a level shifter | [docs/sd-card.md](docs/sd-card.md) |
@@ -47,7 +47,7 @@ Read these points before you use the board:
 - **PmodA and the Raspberry Pi header share eight pins.** Use one of them at a time.
 - **The 125 MHz `SYSCLK` stops while the Ethernet PHY is in reset** (MIO9).
 - **The TUL XDC and the board file have faults.** Use `pynq_z2_master.xdc` (docs/vivado.md).
-- Nothing in this record has been measured on a board yet. Every statement comes from a document.
+- Few statements are measured yet. A statement without **[measured]** comes from a document.
 
 ## Files
 
@@ -85,7 +85,8 @@ sh $P/jtag/load.sh pynq-blinky/build/blinky.bit         # loads the PL; no flash
 ```
 
 Vivado needs the Zynq-7000 devices. On 2026-11-23 the build ran with Vivado 2025.2.1: setup slack
-+5.370 ns, hold slack +0.252 ns, 3 LUT and 30 FF. The load has not run on a board yet.
++5.370 ns, hold slack +0.252 ns, 3 LUT and 30 FF. On 2026-11-24 the load ran on the board, and the
+LEDs, the buttons and the switches did what `blinky.sv` describes.
 
 ## License
 

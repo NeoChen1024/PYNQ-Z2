@@ -34,6 +34,10 @@ agree with the bank voltages on sheet 12 and with the board preset.
 The straps are read only at power-on reset. The manual says that the SRST button does not read
 them again **[manual]**.
 
+On 2026-11-24, JP1 was in the SD position and no card was in the slot. The register `BOOT_MODE`
+(0xF800025C) read 0x5 over JTAG **[measured]**. Its low three bits are 101. This agrees with MODE2,
+MODE1 and MODE0 at high, low and high, the strap values of the SD position in the table above.
+
 ## QSPI flash U16
 
 **[schematic]** sheet 9:
