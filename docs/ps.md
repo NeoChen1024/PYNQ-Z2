@@ -162,8 +162,35 @@ On 2026-11-24, the DDR passed one memory test with the board preset **[measured]
   `CONFIG_SYS_ALT_MEMTEST_BITFLIP`). The data cache was on.
 - The range stops below the relocated U-Boot. The first 1 MiB was not tested.
 
-This is one pass on one board, at a temperature that was not measured. It does not show the timing
-margin of the negative DQS-to-CLK delays (unknowns.md).
+This is one pass on one board, at a temperature that was not measured.
+
+### Data eye
+
+On 2026-11-24, `tools/ddrscan/ddr_eye.tcl` measured the data eye of each byte lane **[measured]**
+(`tools/ddrscan/eye-2026-11-24.csv`). U-Boot waited at its prompt with the DDR set up by the SPL and
+the board preset. The script stopped both CPUs and, over JTAG, forced the slave delay of one lane
+in the PHY (`wr_data_slvN` or `phy_rd_dqs_cfgN`, bit 10). For each delay it wrote 8 KB to the DDR,
+read it back and counted the wrong bits of each lane. The write delays moved in steps of 4 taps,
+the read delays in steps of 2.
+
+| Eye | Lane | Delay without errors (taps) | Width | Delay that training set | Margin below / above |
+|---|---|---|---|---|---|
+| Write data | 0 | 72 to 120 | 48 | 99 | 27 / 21 |
+| Write data | 1 | 72 to 120 | 48 | 95 | 23 / 25 |
+| Read DQS | 0 | 6 to 56 | 50 | 32 | 26 / 24 |
+| Read DQS | 1 | 2 to 54 | 52 | 30 | 28 / 24 |
+
+- A tap is about 14 ps to 15 ps. This follows from the ratios and the taps that the PHY applied
+  (for example a write data ratio of 186/256 of a cycle gave 99 taps); it is not a separate
+  measurement.
+- Thus each eye is about 700 ps wide, about 0.7 of the bit time of 952 ps at 1050 Mb/s. The
+  settings of training are near the middle, with about 0.3 bit time (300 ps to 400 ps) on each side.
+- The negative DQS-to-CLK delays of the board preset (above) do not show in these results: write
+  leveling and training set the delays, and they have margin on both sides.
+- Limits: one board, one temperature (not measured), 8 KB for each point. The DDR accesses over
+  JTAG are slower than accesses of the CPUs, so they cause less simultaneous switching noise.
+- A new ratio in `wr_data_slvN` took effect only at the next DDR initialization; a forced delay took
+  effect at once. `ddr_eye.tcl` thus uses the force bits.
 
 ## PS resets
 

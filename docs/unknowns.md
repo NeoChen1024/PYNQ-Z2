@@ -15,8 +15,6 @@ question removes it here and updates that document.
 - The power-up order of the four outputs of the TPS65400. With its factory EEPROM, they start
   together; whether TUL changed the EEPROM is not known. A measurement of the rails would show it.
   (power.md)
-- How much timing margin the DDR3 has with the negative DQS-to-CLK delays of the board preset,
-  about which Vivado warns. One pass of a memory test found no error. (ps.md)
 
 ## Pins and headers
 
