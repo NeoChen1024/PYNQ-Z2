@@ -86,7 +86,7 @@ set_property CONFIG_VOLTAGE 3.3 [current_design]
 ## Arduino Digital I/O
 #set_property -dict { PACKAGE_PIN T14  IOSTANDARD LVCMOS33 } [get_ports { ar[0] }]; # AR_IO0 IO_L5P_T0_34
 #set_property -dict { PACKAGE_PIN U12  IOSTANDARD LVCMOS33 } [get_ports { ar[1] }]; # AR_IO1 IO_L2N_T0_34
-#set_property -dict { PACKAGE_PIN U13  IOSTANDARD LVCMOS33 } [get_ports { ar[2] }]; # AR_IO2 IO_L3P_T0_DQS_PUDC_B_34;  also PUDC_B. No external pull (measured): only 200 ohm to Arduino AR2
+#set_property -dict { PACKAGE_PIN U13  IOSTANDARD LVCMOS33 } [get_ports { ar[2] }]; # AR_IO2 IO_L3P_T0_DQS_PUDC_B_34;  also PUDC_B. No external pull (measured): only 200 ohm to Arduino AR2. UG470 says PUDC_B must not float; AR2 decides the pull-ups before configuration
 #set_property -dict { PACKAGE_PIN V13  IOSTANDARD LVCMOS33 } [get_ports { ar[3] }]; # AR_IO3 IO_L3N_T0_DQS_34
 #set_property -dict { PACKAGE_PIN V15  IOSTANDARD LVCMOS33 } [get_ports { ar[4] }]; # AR_IO4 IO_L10P_T1_34
 #set_property -dict { PACKAGE_PIN T15  IOSTANDARD LVCMOS33 } [get_ports { ar[5] }]; # AR_IO5 IO_L5N_T0_34

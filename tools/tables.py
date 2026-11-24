@@ -73,7 +73,7 @@ NOTES = {
     "Y13": "on the AREF position of the Arduino header J3. The TUL XDC calls the port a, which collides with the bus a[0..5]",
     "P15": "SCL of the Arduino header (J3.10, silkscreen SCL), measured. The schematic net and the TUL XDC call it AR_SDA",
     "P16": "SDA of the Arduino header (J3.9, silkscreen SDA), measured. The schematic net and the TUL XDC call it AR_SCL",
-    "U13": "also PUDC_B. No external pull (measured): only 200 ohm to Arduino AR2",
+    "U13": "also PUDC_B. No external pull (measured): only 200 ohm to Arduino AR2. UG470 says PUDC_B must not float; AR2 decides the pull-ups before configuration",
     "J15": "U14 and its pull-up R209 are not fitted (measured): the pin is not connected",
     "R19": "inverted: low while a sink asserts HPD (Q8)",
     "T19": "drives HPD through the buffer Q7, which runs on HDMI_RX_5V0",

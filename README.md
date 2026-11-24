@@ -66,6 +66,7 @@ Read these points before you use the board:
 | `jtag/load.sh`, `jtag/load.tcl` | Load a bitstream into the PL over the USB-JTAG. They do not touch the flash or a card |
 | `jtag/boot.sh`, `jtag/boot.tcl` | Boot the PS over JTAG with `xsdb`: `ps7_init`, an optional bitstream, data files and an ELF program |
 | `examples/pl-blinky/` | The smallest PL design: SYSCLK, the switches, the buttons and the LEDs |
+| `tools/bscan/` | Sample the boundary register of the PL over JTAG, also with the PL cleared, and map it to the pins |
 | `tools/pinprobe/` | A JTAG instrument in the PL: reads every PL pin with pull-ups or pull-downs, watches pins, scans the codec I2C bus, drives the HPD of `HDMI_IN`. `census-2026-11-24.csv` is its first result |
 | `linux/` | U-Boot, Linux 6.18 and Alpine Linux on F2FS: see [linux/README.md](linux/README.md) |
 | `board-files/` | The Vivado board files, a copy of XilinxBoardStore: see [board-files/README.md](board-files/README.md) |

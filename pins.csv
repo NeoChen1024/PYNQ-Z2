@@ -202,7 +202,7 @@ U8,13,3.3,IO_L17N_T2_13,RP_IO05,rpio_22_r,LVCMOS33,rpio_22_r,raspberry_pi_tri_i_
 U9,13,3.3,IO_L17P_T2_13,AU_SCL_R,au_scl_r,LVCMOS33,au_scl_r,audio_sc_i (LVCMOS33),11,"pinprobe I2C scan of the codec, 2026-11-24",
 U10,13,3.3,IO_L12N_T1_MRCC_13,AR_A5,a[5],LVCMOS33,a[5],arduino_a5 (LVCMOS33),11,,
 U12,34,3.3,IO_L2N_T0_34,AR_IO1,ar[1],LVCMOS33,ar[1],arduino_a0_a13_tri_i_1 (LVCMOS33),11,,
-U13,34,3.3,IO_L3P_T0_DQS_PUDC_B_34,AR_IO2,ar[2],LVCMOS33,ar[2],arduino_a0_a13_tri_i_2 (LVCMOS33),11,"pinprobe census, 2026-11-24",also PUDC_B. No external pull (measured): only 200 ohm to Arduino AR2
+U13,34,3.3,IO_L3P_T0_DQS_PUDC_B_34,AR_IO2,ar[2],LVCMOS33,ar[2],arduino_a0_a13_tri_i_2 (LVCMOS33),11,"pinprobe census, 2026-11-24",also PUDC_B. No external pull (measured): only 200 ohm to Arduino AR2. UG470 says PUDC_B must not float; AR2 decides the pull-ups before configuration
 U14,34,3.3,IO_L11P_T1_SRCC_34,HDMI_RX_SCL,hdmi_rx_scl,LVCMOS33,hdmi_rx_scl,hdmi_in_ddc_scl (LVCMOS33),11,,
 U15,34,3.3,IO_L11N_T1_SRCC_34,HDMI_RX_SDA,hdmi_rx_sda,LVCMOS33,hdmi_rx_sda,hdmi_in_ddc_sda (LVCMOS33),11,,
 U17,34,3.3,IO_L9N_T1_DQS_34,AR_IO7,ar[7],LVCMOS33,ar[7],arduino_a0_a13_tri_i_7 (LVCMOS33),11,,

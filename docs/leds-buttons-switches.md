@@ -88,5 +88,8 @@ saw this:
 - SW0 made the count slower, and SW1 inverted the four LEDs.
 - BTN0, BTN1 and BTN2 lit red, green and blue of LD4. BTN3 lit red of LD5.
 
-Thus the pins and the polarities of the tables above are correct for these parts. The green and
+Thus the pins and the polarities of the tables above are correct for these parts.
+
+While the PL is not configured or is being configured, the I/O pins have weak pull-ups
+(headers.md). The owner saw LD0 to LD3 glow weakly during configuration (2026-11-24). The green and
 blue colors of LD5 were not tested.

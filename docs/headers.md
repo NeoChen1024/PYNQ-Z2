@@ -142,6 +142,32 @@ no resistor on it other than the 200 ohm to the header. U13 has no external pull
 followed the internal pull of the PL in both pinprobe builds (2026-11-24). Thus PUDC_B floats during
 configuration if nothing is on AR2. See [unknowns.md](unknowns.md).
 
+The state of the pins before configuration **[measured]**, on 2026-11-24: `tools/bscan/sample.tcl`
+sent JPROGRAM, which cleared the PL, and then sampled the boundary register four times:
+
+- 60 of the 68 pins that follow the internal pull (fpga.md, "Pin census") read 1, also V5, which
+  has no connection. Thus the I/O pins have weak pull-ups before configuration.
+- LD0 to LD3 and BTN0 to BTN3 read 0. Each has a weak path to ground (the LED, the 20 kohm of the
+  button), which the pull-up cannot overcome. The owner saw the LEDs glow weakly while the PL was
+  configured: the current of the pull-up goes through the LED, and the LED holds the pin below the
+  input high level.
+- The pins with an external pull-up read 1, and those with a pull-down read 0.
+- U13 (PUDC_B) read 1. PUDC_B high disables the pull-ups, so this reading does not agree with the
+  pull-ups above.
+
+UG470 (`references/amd/ug470_7Series_Config_v1.17.pdf`, page 22) explains the disagreement. PUDC_B
+low enables the internal pull-ups of the SelectIO pins after power-up and during configuration;
+high disables them. PUDC_B must connect directly, or through 1 kohm or less, to VCCO or GND: "Do not
+allow this pin to float before and during configuration." **On this board PUDC_B floats**: it has
+only the 200 ohm to AR2 of the Arduino header. Thus whether the pins have pull-ups before and during
+configuration is not defined by the board. On 2026-11-24 they had pull-ups.
+
+- A shield that drives AR2 decides the state: low enables the pull-ups, high disables them.
+- For a defined state, connect AR2 to GND (pull-ups) or to 3.3 V (no pull-ups) through 1 kohm or
+  less.
+- A design that needs a pin low before configuration needs an external pull-down in any case. A sample with
+pinprobe loaded gave the same 124 values as its census, which checks the cell map of the BSDL.
+
 T16 is `AR_IO10`; F16 is `AR_SS`. The board file of XilinxBoardStore 2025.2 and master gives the
 two pins the other way round; its 2022.2 branch agrees with the schematic (`pins.csv`).
 

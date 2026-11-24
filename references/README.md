@@ -17,6 +17,7 @@ apply to them.
 | `amd/Zynq-7000_Xilinx_Wiki.pdf` | The Zynq-7000 pages of the Xilinx Wiki, exported 2024-01-04 | Xilinx (AMD) | `a4837b36df74949f389364c054d5e6533d815ed5cf610d0fd9dd51d07ef49453` |
 | `micron/MT41K_DDR3L_4Gb_Rev.Q_Dec2017_DS.pdf` | 4Gb: x4, x8, x16 DDR3L SDRAM (MT41K1G4, MT41K512M8, MT41K256M16), data sheet Rev. Q 12/17, from micron.com | Micron Technology | `3b0a5ce422db7f8edaa2a44e389c03fc175b28a253acd2eed799016cbdd622e8` |
 | `amd/ug585-Zynq-7000-TRM_v1.7.pdf` | UG585 v1.7 (2014-02-11), Zynq-7000 All Programmable SoC Technical Reference Manual (original name `ug585-Zynq-7000-TRM.pdf`) | Xilinx (AMD) | `79e7a6633896348138f2a37f4ed8004e41272d541aa7d6fdb72124409f0012d6` |
+| `amd/ug470_7Series_Config_v1.17.pdf` | UG470 v1.17 (2023-12-05), 7 Series FPGAs Configuration User Guide (original name `ug470_7Series_Config.pdf`) | AMD | `52aa1f1943cdf631b5ff3d859a8d5905dc9fd198522e0e9d63cf3f87271d615c` |
 | `realtek/rtl8211e-vb-vl-cg_datasheet_1.6.pdf` | RTL8211E(G)-VB(VL)-CG data sheet Rev. 1.6 (2012-04-03) (original name `rtl8211e(g)-vb(vl)-cg_datasheet_1.6.pdf`) | Realtek Semiconductor | `b081006e6619ba24b38be4959675e36748ad3f80053f27e9319b38a44620fa3c` |
 | `ti/tps65400_SLVSCQ9E.pdf` | TPS65400 data sheet SLVSCQ9E (revised 2022-03) (original name `tps65400.pdf`) | Texas Instruments | `a523c5007fd3f065a507fa90ba27b5fe26afa3af784894b81841e3f350f83efb` |
 | `infineon/s25fl128s-s25fl256s_001-98283_RevT.pdf` | S25FL128S, S25FL256S data sheet 001-98283 Rev. *T (2025-04-21) (original name `infineon-s25fl128s-s25fl256s-128-mb-16-mb-256-mb-32-mb-fl-s-flash-spi-multi-io-3-v-datasheet-en.pdf`) | Infineon Technologies | `e8827e742d791a99e464ab8b694ff1354ef5322ca51b195d4e0f1afbec9457c4` |
@@ -39,3 +40,5 @@ The upstream of this collection is [ZeroX29a/PynqZ2](https://github.com/ZeroX29a
   `AR_SCL` on P16. On the board, P16 is SDA and P15 is SCL (docs/headers.md).
 - The Raspberry Pi pin table of `tul/pynqz2_user_manual_v1_0.pdf` is wrong for pins 7, 8, 10, 18,
   22, 26, 29 and 31 (docs/headers.md).
+- In `tul/TUL_PYNQ_Schematic_R12.pdf`, PUDC_B (U13) goes only to Arduino AR2 through 200 ohm. UG470
+  says that PUDC_B must not float before and during configuration (docs/headers.md).
