@@ -92,6 +92,10 @@ follows is not known (unknowns.md).
 
 On 2026-11-24 the owner looked at the back of the board. It has no revision mark. It has the marks
 `94V-0 A`, `2348-RC`, `E207844` and `STM-5` in the copper or the silkscreen, and labels with the
-product name, a serial number and an EAN barcode. The parts that the record checked agree with the
-schematic file (for example U5, U9, U16 and the DDR3 connections), except the DDR3 part number
-(ps.md).
+product name, a serial number and an EAN barcode. The owner reads `2348` as a date code of the PCB
+maker in the usual form YYWW: week 48 of 2023. Thus the PCB is about six years younger than the
+date on the schematic. No document confirms the meaning of the mark.
+
+The parts that the record checked agree with the schematic file (for example U5, U9, U16 and the
+DDR3 connections), except the DDR3 part number (ps.md) and the names of the Arduino I2C nets
+(headers.md).
