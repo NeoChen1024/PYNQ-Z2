@@ -16,11 +16,10 @@ The connections, **[schematic] sheet 9**:
 Only SDA reaches the FPGA. Thus the design must use the one-wire interface of the chip. The
 ATSHA204A data sheet describes that interface. It is not in this repository.
 
-**It is not known whether U14, R208 and R209 are fitted.** The schematic marks all three with `/X`.
-The schematic does not define `/X`. Other parts with `/X` include R139 to R146, 150 ohm HDMI
-pull-ups whose task R321 to R328 already do ([hdmi.md](hdmi.md)). This suggests that `/X` marks a
-part that is not fitted, but no source says so. The manual does not name the chip **[manual]**. See
-[unknowns.md](unknowns.md).
+**U14 is not fitted.** The owner saw its footprint empty on 2026-11-24. The schematic marks U14,
+R208 and R209 with `/X`. The manual does not name the chip **[manual]**. Thus `crypto_sda` (J15)
+connects only to the footprint, and to R209 if R209 is fitted. A design must not expect a device
+on it.
 
 The TUL XDC has the port `crypto_sda` (section "Crypto SDA"). The board file has no interface for
 the chip.

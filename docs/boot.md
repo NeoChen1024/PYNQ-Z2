@@ -42,7 +42,9 @@ MODE1 and MODE0 at high, low and high, the strap values of the SD position in th
 
 **[schematic]** sheet 9:
 
-- U16 is marked `S25FL128SAGMFI00`. The manual gives a Spansion S25FL128S, 16 MB, at 3.3 V.
+- U16 is marked `S25FL128SAGMFI00` on the schematic. The manual gives a Spansion S25FL128S, 16 MB,
+  at 3.3 V. The fitted chip has `SPANSION` and `FL128SAIF00` on it (seen 2026-11-24). U-Boot read
+  the JEDEC ID `01 20 18 4D 01 80` and found an S25FL128S **[measured]**.
 - It connects to MIO1 to MIO6 (`CS`, `DQ0` to `DQ3`, `SCK`), which is the QSPI0 single-device mode
   of the board preset. MIO6 goes through R221 (0 Ω).
 - `CS#` has a 4.7 kΩ pull-up (R212). `RESET#` and `VCC` are on `VCC3V3`.
@@ -54,6 +56,23 @@ MODE1 and MODE0 at high, low and high, the strap values of the SD position in th
 The manual says that a one-time-programmable area of the flash holds a unique 48-bit identifier
 at OTP addresses 0x20 to 0x25. PYNQ uses it as the MAC address (ethernet.md). Never write the OTP
 area: the identifier cannot be restored.
+
+On 2026-11-24, U-Boot read the OTP area with the command OTP Read (0x4B) **[measured]**. The reads
+used `sspi` of a test build of U-Boot (`CONFIG_CMD_SPI`), loaded over JTAG. Two reads gave the
+same data:
+
+| OTP address | Contents |
+|---|---|
+| 0x00 to 0x0F | 16 bytes that are not all 0xFF. The Spansion data sheet calls this a factory random number; that data sheet is not in `references/` |
+| 0x10 to 0x13 | 0xFF |
+| 0x14 to 0x1F | 0xFF |
+| 0x20 to 0x25 | A 6-byte value. Its first three bytes are an OUI of the IEEE register (`C.P. Technology Co., Ltd.`), and it is a globally unique unicast address |
+| 0x26 to 0x4A | 0xFF |
+
+Thus the board has a unique MAC address at 0x20 to 0x25, as the manual says. The record does not
+give the value, because it is the address of the owner's board on the LAN (AGENTS.md). The
+bytes 0x10 to 0x13 are 0xFF. If they are the lock bits of the OTP regions, as in other Spansion
+devices, no region is locked, and a write can still change the OTP area.
 
 ## Boot images
 

@@ -70,3 +70,9 @@ gives the analog front end of these inputs.
 The file is `references/tul/TUL_PYNQ_Schematic_R12.pdf`. Its PDF title is `tul_pynq_r11_0109`, and
 the title block of each sheet gives Rev `R10`, dated 2018-01-09. Which revision the fitted board
 follows is not known (unknowns.md).
+
+On 2026-11-24 the owner looked at the back of the board. It has no revision mark. It has the marks
+`94V-0 A`, `2348-RC`, `E207844` and `STM-5` in the copper or the silkscreen, and labels with the
+product name, a serial number and an EAN barcode. The parts that the record checked agree with the
+schematic file (for example U5, U9, U16 and the DDR3 connections), except the DDR3 part number
+(ps.md).

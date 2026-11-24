@@ -6,10 +6,11 @@ question removes it here and updates that document.
 ## Board and parts
 
 - Which revision of the schematic the board follows. The file is named R12, its PDF title says
-  `r11_0109`, and the title blocks say R10 (2018-01-09). (fpga.md)
-- What `/X` on the schematic means. The record assumes "not fitted". It applies to U14, R208, R209,
-  R139 to R146, R299, JP2, JP3, J13, J14 and C19. (crypto.md, hdmi.md, jtag-uart.md, power.md)
-- Whether U14, the ATSHA204A crypto chip, is fitted. (crypto.md)
+  `r11_0109`, and the title blocks say R10 (2018-01-09). The board has no revision mark on its
+  back. (fpga.md)
+- What `/X` on the schematic means. U14, J13, J14 and JP2 are not fitted, but JP3 is fitted (seen
+  2026-11-24). Thus `/X` does not always mean "not fitted". R208, R209, R139 to R146, R299 and C19
+  were not checked. (crypto.md, hdmi.md, jtag-uart.md, power.md)
 - The power-up order of the four outputs of the TPS65400. (power.md)
 - How much timing margin the DDR3 has with the negative DQS-to-CLK delays of the board preset,
   about which Vivado warns. One pass of a memory test found no error. (ps.md)
@@ -34,13 +35,13 @@ question removes it here and updates that document.
 - Whether a register write to the Ethernet PHY can stop `CLK125`. (clocks.md)
 - How the Zynq decodes the boot mode straps on MIO2 to MIO8. The decoding is in UG585, which is not
   in `references/`. (boot.md)
-- The MAC address in the OTP of the QSPI flash comes from the manual only. It was not read on the
-  board. (ethernet.md, boot.md)
+- What the bytes 0x10 to 0x13 of the OTP area of the QSPI flash are. They read 0xFF. The data
+  sheet of the S25FL128S is not in `references/`. (boot.md)
 - What the straps TXDLY, RXDLY, SELRGV, AN0 and AN1 of the RTL8211E select. Its datasheet is not in
   `references/`. (ethernet.md)
 - The I2C address of the audio codec. The ADAU1761 datasheet is not in `references/`. (audio.md)
 
 ## Host side
 
-- Whether openFPGALoader finds the FT2232H without setup, and what else its 93AA56B EEPROM holds.
+- Whether `hw_server` needs the strings in the user area of the FT2232H EEPROM to find the board.
   (jtag-uart.md)

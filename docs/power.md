@@ -44,7 +44,8 @@ Thus the USB-JTAG bridge has no power while the switch is off.
 | U21 | `REF3012AIDBZT` | `XADC1V8` | `XADCVREF` | | **[schematic]** sheet 15 |
 
 The currents are the notes on sheet 14. They are not measured. U18 has an I2C port. Its pins go
-to the 5-pin header JP2, which the schematic marks `/X`. No FPGA pin connects to that I2C port.
+to the 5-pin header JP2, which the schematic marks `/X`. JP2 is on the back of the board, and the
+owner saw it not fitted (2026-11-24). No FPGA pin connects to that I2C port.
 
 ## Rails of the SoC
 
