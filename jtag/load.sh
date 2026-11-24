@@ -15,6 +15,13 @@ status=0
 # Vivado leaves its servers running.
 pkill -u "$(id -u)" -x hw_server 2>/dev/null || true
 pkill -u "$(id -u)" -x cs_server 2>/dev/null || true
+# hw_server set the reset vector catch of the cores; release.tcl clears it (see there). The hw_server of
+# Vivado is stopped first: if it stayed, it would set the catch again. xsdb starts its own server and
+# stops it at its end. xsdb is beside vivado, or XSDB names it.
+xsdb="${XSDB:-$(dirname "$(command -v "$vivado")")/xsdb}"
+sleep 1
+"$xsdb" "$here/release.tcl" >/dev/null 2>&1 || echo "warning: $xsdb release.tcl failed; Linux may not start CPU1 (jtag/release.tcl)" >&2
+pkill -u "$(id -u)" -x hw_server 2>/dev/null || true
 if [ "$status" -ne 0 ] || ! grep -q '^DONE=1' load.out; then
     echo "load failed; see $(pwd)/load.log" >&2
     exit 1

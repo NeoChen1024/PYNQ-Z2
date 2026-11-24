@@ -118,3 +118,6 @@ These choices followed the documents. The boot of 2026-11-24 confirmed them **[m
   the card when it was in the slot (docs/sd-card.md).
 - The PHY resets on MIO9 and MIO46 (`reset-gpios`): both PHYs worked after Linux released them.
 - The operating points 650 MHz and 325 MHz: cpufreq changed between them.
+- Both cores run, after a power-on and after a reboot. If Linux prints `CPU1: failed to come
+  online`, a JTAG session left the reset vector catch set: run `xsdb jtag/release.tcl reset`, or
+  switch the power off and on (docs/jtag-uart.md).

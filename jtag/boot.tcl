@@ -26,4 +26,7 @@ foreach item $data {
 dow $elf
 con
 puts "started $elf"
+set ::release_only 1
+source [file join [file dirname [info script]] release.tcl]
+release_cores
 disconnect

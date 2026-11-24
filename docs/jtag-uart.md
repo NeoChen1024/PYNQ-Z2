@@ -84,3 +84,25 @@ a JTAG boot if the boot ROM finds no card.
 the IDCODE without the version bits (0x3727093). Its board list has `pynq_z2` (cable `ft2232`).
 
 MIO2 (`MODE3`) is a boot strap that the board holds low by default (boot.md).
+
+### The reset vector catch of hw_server
+
+When `hw_server` (of xsdb or of Vivado) connects, it sets the reset vector catch of both Cortex-A9
+cores (bit 0 of `DBGVCR`, at 0xF889001C and 0xF889201C), and it sets it again within 300 ms if
+something clears it. The bit stays after the disconnect, until a power-on reset. The debug logic is
+not reset by a system reset (UG585, section 26.2.2). On 2026-11-24 **[measured]**:
+
+- Linux printed `CPU1: failed to come online` and ran on one core, after each boot that followed a
+  JTAG session. Linux resets CPU1 to start it, and CPU1 stopped at its reset vector (`xsdb`:
+  "Stopped: (Vector Catch)").
+- A `reboot` of Linux stopped the board: the system reset stopped both cores.
+- After `jtag/load.sh` (Vivado), Linux could not bring CPU1 back online after `echo 0` and `echo 1`
+  to `/sys/devices/system/cpu/cpu1/online`.
+- A power cycle cleared the bit.
+
+`jtag/release.tcl` sets `disable-access` for the two cores in `hw_server`, which then leaves them
+alone, and writes 0 to both `DBGVCR`. With `reset`, it then resets the system through the SLCR, as
+a reboot of Linux does. Each script of this repository that connects to the board calls it before
+it disconnects. `jtag/load.sh` first stops the `hw_server` of Vivado, which would set the bit again.
+After the change, CPU1 went offline and online again after each of `load.sh` (two times),
+`pinprobe.tcl` and `sample.tcl`, and a reboot of Linux came back with two cores.

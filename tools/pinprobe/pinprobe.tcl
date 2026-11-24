@@ -115,4 +115,8 @@ switch -- $cmd {
     }
     default { error "unknown command $cmd" }
 }
+# Clear the reset vector catch that hw_server set (jtag/release.tcl).
+set ::release_only 1
+source [file join [file dirname [info script]] .. .. jtag release.tcl]
+release_cores
 disconnect

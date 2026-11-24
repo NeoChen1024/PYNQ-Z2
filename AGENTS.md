@@ -113,6 +113,8 @@ copy pins, figures or limits into this guide.
 - A build writes its products outside the repository: to the current directory, or to `WORK`. Do
   not leave build output or `__pycache__` in the repository. The Python scripts set
   `sys.dont_write_bytecode`.
+- A script that connects to the board through `hw_server` (xsdb or Vivado) calls `jtag/release.tcl`
+  before it disconnects, or Linux loses CPU1 at its next boot (docs/jtag-uart.md).
 - Each PL design instantiates a PS7 cell, even if it does not use the PS. A bitstream without one
   stops Linux when it is loaded over JTAG (docs/vivado.md).
 - Vivado writes a bitstream when timing fails. A build script checks the slack and stops if it is

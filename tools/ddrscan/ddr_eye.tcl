@@ -92,4 +92,8 @@ write_block
 lassign [errors] e0 e1
 puts "restored,-,-,$e0,$e1"
 foreach n {0 1} { targets -set -nocase -filter "name =~ \"*Cortex-A9*#$n\""; catch {con} }
+# Clear the reset vector catch that hw_server set (jtag/release.tcl).
+set ::release_only 1
+source [file join [file dirname [info script]] .. .. jtag release.tcl]
+release_cores
 disconnect
