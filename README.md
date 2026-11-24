@@ -96,6 +96,6 @@ These files are third-party material and keep their own terms:
 - `references/`: the documents of TUL, AMD, the authors of the Zynq Book and eneriz-daniel. See
   [references/README.md](references/README.md).
 - `board-files/`: XilinxBoardStore, under the Apache License 2.0.
-- `linux/patches/`: changes to Linux, under the GPL-2.0 of Linux.
+- `linux/patches/`: changes to Linux and U-Boot, under the GPL-2.0 of Linux and U-Boot.
 
 `pins.csv` and `pynq_z2_master.xdc` state pin assignments of the schematic as facts.

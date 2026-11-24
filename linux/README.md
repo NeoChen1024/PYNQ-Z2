@@ -15,7 +15,7 @@ on the card. No Vitis FSBL and no PetaLinux are used. The PL is free for the des
   `dd bs=1M iflag=direct` took 12.6 s: 20.3 MB/s. The card was a 64 GB card, `SB64G`.
 - cpufreq (`ondemand`) used both operating points, 650 MHz and 325 MHz.
 - The QSPI flash showed as the read-only `mtd0` (16 MiB).
-- The USB host found a USB flash drive at boot (`usb-storage`), with the patch of `patches/`
+- The USB host found a USB flash drive at boot (`usb-storage`), with the patch of `patches/linux/`
   (see below).
 
 Before the board, the system booted in QEMU (`qemu.sh`, QEMU machine `xilinx-zynq-a9`) on
@@ -28,8 +28,8 @@ Before the board, the system booted in QEMU (`qemu.sh`, QEMU machine `xilinx-zyn
 | Alpine Linux | 3.24.4, armv7 | The `alpine:3.24.4` container and <https://dl-cdn.alpinelinux.org/alpine/v3.24/> |
 
 The sources stay outside the repository. The build scripts add `zynq-pynq-z2.dts` and its line in
-the Makefile of the device trees to each source tree. `build-kernel.sh` also applies the patches of
-`patches/` to the Linux tree.
+the Makefile of the device trees to each source tree. `build-kernel.sh` applies the patches of
+`patches/linux/`, and `build-uboot.sh` the patches of `patches/u-boot/`.
 
 ## Files
 
@@ -37,7 +37,7 @@ the Makefile of the device trees to each source tree. `build-kernel.sh` also app
 |---|---|
 | `zynq-pynq-z2.dts` | The device tree of the board, for U-Boot and Linux: UART0, GEM0 with the PHY at MDIO address 1, SDIO0, USB0 as host, the QSPI flash (read-only), the HDMI output DDC on MIO50/51 |
 | `pynq-z2.config` | The kernel configuration fragment, on top of `multi_v7_defconfig` |
-| `patches/` | Patches to Linux, applied by `build-kernel.sh` (GPL-2.0, as Linux) |
+| `patches/linux/`, `patches/u-boot/` | Patches to Linux and to U-Boot, applied by the build scripts (GPL-2.0, as Linux and U-Boot) |
 | `build-kernel.sh` | Builds `zImage`, the device tree and the modules with clang (`LLVM=1`) |
 | `build-uboot.sh` | Builds `boot.bin` (the SPL with the boot header), `u-boot.img` and `u-boot.elf` with `arm-none-eabi-gcc` |
 | `mkrootfs.sh` | Makes `rootfs.f2fs` in an armv7 Alpine container |
@@ -70,8 +70,10 @@ without a card in the boot path.
   The FIT images are not signed.
 - U-Boot reads `extlinux/extlinux.conf` from the FAT partition. The kernel command line has
   `console=ttyPS0,115200 root=/dev/mmcblk0p2 rootfstype=f2fs`.
-- The MAC address is random for each boot of U-Boot (`CONFIG_NET_RANDOM_ETHADDR`). The unique
-  identifier in the OTP area of the QSPI flash is not used (docs/boot.md).
+- U-Boot reads the MAC address from the OTP area of the QSPI flash, offset 0x20 (docs/boot.md),
+  and gives it to Linux in the device tree. `patches/u-boot/` adds this (`CONFIG_ZYNQ_QSPI_OTP_MAC`).
+  It only reads the OTP area. An `ethaddr` in `uboot.env` takes precedence. If the OTP area has no
+  valid address, U-Boot makes a random one (`CONFIG_NET_RANDOM_ETHADDR`).
 - Alpine runs OpenRC with busybox, sshd (only the key of `mkrootfs.sh`), chrony, and DHCP on `eth0`.
   Root has no password on the console `ttyPS0`.
 - The QSPI flash is one read-only partition in Linux.
@@ -89,13 +91,23 @@ port work **[measured]** 2026-11-24:
 
 - The USB0 node uses `phys`, not the old `usb-phy`. The ChipIdea driver looks up only `phys`. With
   `usb-phy`, it probed before the PHY driver, failed with `-ENXIO` and printed no message.
-- `patches/0001-usb-chipidea-host-drive-external-VBUS-of-a-ULPI-PHY.patch` sets `DrvVbus` and
+- `patches/linux/0001-usb-chipidea-host-drive-external-VBUS-of-a-ULPI-PHY.patch` sets `DrvVbus` and
   `DrvVbusExternal` in the OTG Control register of the ULPI PHY when the port power changes.
 
 The TUSB1210 drives `CPEN`, the enable of the VBUS switch U10, only with `DrvVbusExternal` set
 (docs/usb.md). `usb-nop-xceiv` does not set it, and the TUSB1210 PHY driver of Linux does not
 connect to the ChipIdea driver. Without the patch, the controller runs, but VBUS stays off and the
 port finds no device.
+
+## MAC address
+
+U-Boot v2026.10 has no code that reads the MAC address of this board, and it made a random address
+at each boot. `patches/u-boot/0001-net-zynq_gem-read-the-MAC-address-from-the-QSPI-OTP.patch` adds
+`read_rom_hwaddr` to the GEM driver. With `CONFIG_ZYNQ_QSPI_OTP_MAC`, it sends OTP Read (0x4B) to
+the QSPI flash and reads 6 bytes at offset 0x20. On 2026-11-24 **[measured]**:
+
+- U-Boot printed no random address, and `ethaddr` was equal to the OTP bytes 0x20 to 0x25.
+- Linux used the same address (`macb ... eth0`), and DHCP gave the same lease after a reboot.
 
 ## Checked on the board
 

@@ -73,4 +73,6 @@ LED blinks with traffic, and the yellow LED blinks with activity and is off with
 
 The board has no EEPROM for a MAC address. The manual says that the OTP area of the QSPI flash
 holds a unique EUI-48 identifier at OTP addresses 0x20 to 0x25, and that the PYNQ boot loader uses
-it as the MAC address (boot.md). This was not read on the board.
+it as the MAC address (boot.md). The board has this identifier: U-Boot read it on 2026-11-24
+**[measured]** (boot.md). U-Boot of `linux/` reads it at each boot and gives it to Linux
+(linux/README.md, "MAC address").

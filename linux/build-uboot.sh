@@ -2,8 +2,9 @@
 # Builds U-Boot SPL and U-Boot for the PYNQ-Z2: xilinx_zynq_virt_defconfig with zynq-pynq-z2.dts and
 # the PS initialization of ps7/build.sh. The environment is kept only in uboot.env on the FAT
 # partition of the card, never in the QSPI flash. The FIT images are not signed: the host tools then
-# need no libcrypto (OpenSSL 4 has no ENGINE API, which the signing tools of U-Boot use). The source tree gets only the device tree and its
-# line in the Makefile; the objects go to WORK.
+# need no libcrypto (OpenSSL 4 has no ENGINE API, which the signing tools of U-Boot use). U-Boot reads
+# the MAC address from the OTP area of the QSPI flash (patches/u-boot/). The source tree gets the device
+# tree, its line in the Makefile and the patches; the objects go to WORK.
 #
 #   [WORK=dir] [CROSS_COMPILE=arm-none-eabi-] sh build-uboot.sh /path/to/u-boot /path/to/ps7_init_gpl.c
 #
@@ -37,6 +38,13 @@ install -m 644 "$here/zynq-pynq-z2.dts" "$src/arch/arm/dts/zynq-pynq-z2.dts"
 grep -q 'zynq-pynq-z2.dtb' "$src/arch/arm/dts/Makefile" || sed -i 's/^\(\s*\)zynq-zybo-z7.dtb/\1zynq-pynq-z2.dtb \\\n\1zynq-zybo-z7.dtb/' "$src/arch/arm/dts/Makefile"
 grep -q 'zynq-pynq-z2.dtb' "$src/arch/arm/dts/Makefile" || { echo "could not add the dtb to $src/arch/arm/dts/Makefile" >&2; exit 1; }
 
+# A patch that reverses cleanly is in the tree already.
+for p in "$here"/patches/u-boot/*.patch; do
+    [ -e "$p" ] || continue
+    patch -d "$src" -p1 -R -s -f --dry-run <"$p" >/dev/null 2>&1 && continue
+    patch -d "$src" -p1 -s -f <"$p" >/dev/null || { echo "could not apply $p" >&2; exit 1; }
+done
+
 b="$work/ubuild"
 mk() { make -C "$src" O="$b" -j"$(nproc)" "$@"; }
 mk xilinx_zynq_virt_defconfig >/dev/null
@@ -52,8 +60,10 @@ mk xilinx_zynq_virt_defconfig >/dev/null
     --disable FIT_SIGNATURE \
     --disable SPL_FIT_SIGNATURE \
     --disable TOOLS_KWBIMAGE \
-    --disable TOOLS_LIBCRYPTO
+    --disable TOOLS_LIBCRYPTO \
+    --enable ZYNQ_QSPI_OTP_MAC
 mk olddefconfig >/dev/null
+grep -q '^CONFIG_ZYNQ_QSPI_OTP_MAC=y' "$b/.config" || { echo "ZYNQ_QSPI_OTP_MAC is not set" >&2; exit 1; }
 grep -q '^CONFIG_ENV_IS_IN_SPI_FLASH=y' "$b/.config" && { echo "the environment is still in the QSPI flash" >&2; exit 1; }
 mk >"$work/build.log" 2>&1 || { tail -20 "$work/build.log" >&2; exit 1; }
 cp "$b/spl/boot.bin" "$b/u-boot.img" "$b/u-boot.elf" "$work/"
