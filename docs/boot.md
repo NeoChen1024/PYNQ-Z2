@@ -52,8 +52,9 @@ power-on reset.
 
 On 2026-11-24, JP1 was in the SD position and no card was in the slot. The register `BOOT_MODE`
 (0xF800025C) read 0x5 over JTAG **[measured]**. By UG585, Appendix B (page 1607), bit 4 is
-`PLL_BYPASS` (0) and bits 3 to 0 are the straps: cascade JTAG and SD boot. The JTAG and QSPI
-positions were not read.
+`PLL_BYPASS` (0) and bits 3 to 0 are the straps: cascade JTAG and SD boot. After a power cycle in
+each other position, `BOOT_MODE` read 0x0 (JTAG) and 0x1 (QSPI). The three positions agree with
+UG585.
 
 If the boot ROM finds no boot image on the card, it goes into a non-secure lockdown: it clears the
 PL, enables JTAG and stops both CPUs in WFE (UG585, pages 167, 189 and 194; error 0x200A on page

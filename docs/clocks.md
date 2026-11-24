@@ -29,9 +29,17 @@ PHY is in reset and `CLK125` stops **[manual]**.
 - The PHY gives `CLK125` with its default settings **[measured]**. On 2026-11-24, pl-blinky
   counted on LD0 to LD3 from `SYSCLK`. No software had initialized the PS or the PHY. The frequency
   was not measured.
-- A register write can stop `CLK125`: bit 4 of PHYCR (register 0x10, page 0) is "Disable CLK125"
-  (RTL8211E data sheet, Table 37, PDF page 49). Its default is 0, `CLK125` on. While the bit is
-  1, `SYSCLK` stays low. This was not tested on the board.
+- A register write stops `CLK125`: bit 4 of PHYCR (register 0x10, page 0) is "Disable CLK125"
+  (RTL8211E data sheet, Table 37, PDF page 49). On 2026-11-24 **[measured]**, U-Boot read PHYCR as
+  0x016E. pinprobe counted the changes of its bit that `SYSCLK` divides by 2^23, for 8 s each:
+
+  | PHYCR | Changes in 8 s |
+  |---|---|
+  | 0x016E (default) | 119 |
+  | 0x017E (bit 4 set, with `mii write`) | 0 |
+  | 0x016E (written back) | 119 |
+
+  119 changes in 8 s are 14.9 per second, which agrees with 125 MHz / 2^23 to about 1 %.
 - The RTL8211E data sheet does not say whether `CLK125` stops while `PHYRSTB` is low. The manual
   says that it stops.
 
