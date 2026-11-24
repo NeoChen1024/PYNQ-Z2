@@ -20,19 +20,10 @@ question removes it here and updates that document.
 
 ## Pins and headers
 
-- Whether the I/O pull-ups are on during configuration. U13 (`PUDC_B`) has no external pull, so it
-  floats if nothing is on Arduino AR2. (headers.md)
 - Whether R299 is fitted. The HPD of `HDMI_IN` works in each test, so the owner thinks that R299
   is fitted and that its `/X` is a mistake of the schematic. Not seen. (hdmi.md)
 
 ## Clocks, boot and PS
 
-- Whether a write of PHYCR bit 4 stops `CLK125` on the board, as the data sheet says. (clocks.md)
-- `BOOT_MODE` in the JTAG and QSPI positions of JP1 was not read. UG585 gives 0x0 and 0x1. (boot.md)
-- Which signal from the PL to the PS stops Linux when a bitstream without a PS7 cell is loaded.
-  CPU0 was in the FIQ handler. (vivado.md)
-
-## Host side
-
-- Whether `hw_server` needs the strings in the user area of the FT2232H EEPROM to find the board.
-  (jtag-uart.md)
+- How the FIQ from the PL (`IRQF2P[18]`) reaches CPU0 while `ICCICR` is 0x1. UG585 says that the
+  pass-through is used only when `ICCICR[1:0]` is 0. (vivado.md)

@@ -85,8 +85,21 @@ On 2026-11-24, Linux 6.18.64 ran from the card, with `LVL_SHFTR_EN` (0xF8000900)
 | No load; only `xsdb` and Vivado opened the JTAG target | No effect |
 | pl-blinky with an empty PS7 cell (`PS7 ps7_i ();`) | No effect in 5 minutes |
 | pinprobe with an empty PS7 cell | No effect; the pin reads were the same as without the cell |
+| pl-blinky with a PS7 cell and `IRQF2P[16]` = 1 (the IRQ of CPU0 from the PL) | No effect in 60 s |
+| pl-blinky with a PS7 cell and `IRQF2P[18]` = 1 (the FIQ of CPU0 from the PL) | The PS stopped at once. CPU0 was in `ct_kernel_enter_state`, on the path of the FIQ handler |
 
-Thus each design of this repository instantiates `PS7` with nothing connected. Vivado ties the
-inputs of the cell, as the `processing_system7` IP does. A block design with `processing_system7`
-has the cell already. A bitstream that is loaded before Linux starts, or in JTAG mode, is not
-affected. Which signal from the PL to the PS causes the stop is not known (unknowns.md).
+The cause is the FIQ of CPU0. `IRQF2P[19:16]` are the FIQ and IRQ lines of the two CPUs from the
+PL. They are active high at the PS-PL interface (UG585, Table 7-2, page 216). Linux does not use
+the FIQ: it handles it as an NMI and returns, and the FIQ, which is level-sensitive, is still on.
+The empty PS7 cell and the `processing_system7` IP tie `IRQF2P` to 0. Thus, without a PS7 cell, the
+FIQ line of CPU0 is active; this agrees with all the tests, but the level of the line was not
+measured directly.
+
+Each design of this repository instantiates `PS7` with nothing connected. A block design with
+`processing_system7` has the cell already. A design that uses the FIQ of a CPU (`Core0_nFIQ`,
+`Core1_nFIQ` of the IP) must keep it inactive while Linux runs. A bitstream that is loaded before
+Linux starts, or in JTAG mode, is not affected.
+
+CPU0 read `ICCICR` = 0x1 while Linux ran. By UG585, Figure 7-3 (page 216), the FIQ from the PL then
+goes through the GIC and not directly to the CPU, and with `FIQEn` = 0 the GIC does not signal a
+FIQ. How the FIQ still reached CPU0 is not known (unknowns.md).
