@@ -50,6 +50,20 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 	};
+
+	/*
+	 * The XADC of the SoC as a hwmon device for lm-sensors (docs/fpga.md). The indices are the channel
+	 * order of the xilinx-xadc driver: the temperature, then VCCINT, VCCAUX, VCCBRAM, VCCPINT, VCCPAUX
+	 * and VCCO_DDR. The labels come from the driver.
+	 */
+	xadc-hwmon {
+		compatible = "iio-hwmon";
+		io-channels = <&adc 0>, <&adc 1>, <&adc 2>, <&adc 3>, <&adc 4>, <&adc 5>, <&adc 6>;
+	};
+};
+
+&adc {
+	#io-channel-cells = <1>;
 };
 
 &clkc {

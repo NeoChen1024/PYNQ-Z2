@@ -72,6 +72,53 @@ owner saw it not fitted (2026-11-24). No FPGA pin connects to that I2C port.
 
 The manual names the power LED, the `DONE` LED and the status LEDs of USB and Ethernet.
 
+The conditions that pull `PG_ALL` low come from the TPS65400 data sheet (page 8) and sheet 15:
+
+- If `VCC5V0` falls below the input UVLO (3.4 V to 3.75 V), all four outputs stop.
+- If an output stays below 83 % of its set voltage for 55 µs to 95 µs, `PGOOD` falls. It
+  rises again above 92 %.
+- An overvoltage (111 %) or the thermal shutdown (160 °C) also pulls `PGOOD` low.
+- R290 (20 kΩ) and R291 (10 kΩ) give `EN_1` = `VCC5V0` / 3. The enable falls at 0.97 V to
+  1.07 V, which is 2.9 V to 3.2 V of `VCC5V0`. Thus the UVLO stops the outputs first.
+
+These figures are derived, not measured.
+
+## Reset reason
+
+The boot ROM writes the reason of the last reset into `REBOOT_STATUS` (0xF8000258). Only a
+power-on reset clears it (UG585, page 1606). Bit 22 is POR, bit 21 `SRST_B`, bit 19 the SLCR
+soft reset (Linux `reboot`), and bits 18 to 16 are the watchdogs. Linux reads it with
+`/dev/mem`. Linux changes only bits 31 to 24 (`arch/arm/mach-zynq/slcr.c`).
+
+After a power-on with the switch, the register read 0x00400000 (2026-11-25) **[measured]**.
+
+On 2026-11-25 the board reset itself while Linux was idle. After this reset, the register read
+0x00400000: a power-on reset, thus `PG_ALL` fell. The FT2232H, which runs from `VCC3V3`, did not
+disconnect from the host. Thus `VCC3V3` stayed high enough for the FT2232H. The kernel and the
+host logs showed nothing at that time. The cause is not known (unknowns.md).
+
+A later run of 8 hours, idle on USB power with an inline meter, had no reset (2026-11-25)
+**[measured]**. A script read the XADC every 0.5 s and printed the minimum and the maximum each
+minute: 474 minutes. The lowest values were 1.006 V (`VCCINT`), 1.772 V (`VCCAUX`) and 1.471 V
+(`VCCO_DDR`).
+
+## Consumption
+
+The owner read an inline USB meter on J8, with J9 on `USB` (2026-11-25) **[measured]**. The PL was
+not configured, Ethernet had a 1 Gb/s link, and no USB device was connected. Linux ran
+`linux/README.md`, with the CPU at 650 MHz or 325 MHz (`schedutil`).
+
+| Load | Current at J8 | Voltage at J8 |
+|---|---|---|
+| Linux idle | about 0.30 A | 4.8 V to 4.9 V |
+| Two shell busy loops, 60 s | 0.41 A | at least 4.88 V |
+| Two `memtester 100M`, 60 s | 0.48 A | at least 4.88 V |
+
+From the start of the first load to the end of the second, the XADC read 398 samples, one every
+0.2 s, from `xadc_hwmon` (fpga.md). Each SoC rail stayed within 1.5 % of the set voltage of its
+regulator (1.02 V, 1.80 V, 1.50 V). The die temperature was at most 49.2 °C. The full load is near the 0.5 A of a USB 2.0 port. A PL design or a USB device adds
+current. Then use the barrel jack DC1, as the manual recommends.
+
 ## Sequence of U18
 
 The order of the four outputs is not set by a pin. The TPS65400 keeps it in its EEPROM, which only

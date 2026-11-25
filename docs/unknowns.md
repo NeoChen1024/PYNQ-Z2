@@ -15,6 +15,10 @@ question removes it here and updates that document.
 - The power-up order of the four outputs of the TPS65400. With its factory EEPROM, they start
   together; whether TUL changed the EEPROM is not known. A measurement of the rails would show it.
   (power.md)
+- Why the board made a power-on reset while Linux was idle on USB power (2026-11-25). The input
+  must fall to about 3.5 V for this, but an inline USB meter showed at least 4.88 V at full load.
+  A meter that keeps the minimum voltage, or the fault bits of the TPS65400 through JP2, would show
+  more. (power.md)
 
 ## Pins and headers
 

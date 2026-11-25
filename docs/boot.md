@@ -59,7 +59,7 @@ UG585.
 If the boot ROM finds no boot image on the card, it goes into a non-secure lockdown: it clears the
 PL, enables JTAG and stops both CPUs in WFE (UG585, pages 167, 189 and 194; error 0x200A on page
 190). Thus a JTAG boot works in SD mode with no card, as on 2026-11-24 (jtag-uart.md). Which error
-code the boot ROM sets with no card at all was not read (`REBOOT_STATUS`).
+code the boot ROM sets with no card at all was not read (`REBOOT_STATUS`, power.md).
 
 ## QSPI flash U16
 

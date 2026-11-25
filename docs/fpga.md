@@ -65,6 +65,20 @@ The MIO pins and the DDR pins are not in the XDC. The PS7 configuration sets the
 The channel numbers come from the pin function names (`_ADnP`/`_ADnN`) on sheet 11. headers.md
 gives the analog front end of these inputs.
 
+In Linux, the `xilinx-xadc` driver reads the die temperature and the six supply channels.
+`linux/zynq-pynq-z2.dts` gives them to `iio-hwmon`, so `sensors` of lm-sensors shows them as
+`xadc_hwmon`. On 2026-11-25, idle, it showed **[measured]**:
+
+| Label | Value |
+|---|---|
+| `vccint`, `vccbram`, `vccpint` | 1.02 V |
+| `vccaux` | 1.79 V |
+| `vccpaux` | 1.80 V |
+| `vccoddr` | 1.50 V |
+| `temp1` | 43.8 °C |
+
+The auxiliary channels of the Arduino header are not in the device tree.
+
 ## Pin census
 
 `tools/pinprobe/` reads the 123 PL pins with a net (all except `SYSCLK`) and V5 over JTAG. It is built twice: with the
