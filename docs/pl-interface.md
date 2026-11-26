@@ -34,7 +34,8 @@ The interface needs the boot files of `linux/` from that commit or later: `BOOT.
    command of the PS.
 5. The interrupt of the design is `IRQF2P[0]`, active high. The line stays high until software
    removes the cause.
-6. The HP ports use 64-bit data. A design with 32-bit data sets the AFI registers itself (see
+6. The HP ports use 64-bit data. A design with 32-bit data sets the AFI registers itself, before
+   its first transfer. A port keeps one data width until a reset of the PS (see
    [HP ports](#hp-ports)).
 
 ## Register window on M_AXI_GP0
@@ -210,7 +211,28 @@ cell, and the port works without a change to `ps7_init` **[measured]** (the test
   bits: bit 0 (`32BitEn`) of `AFI_RDCHAN_CTRL` (0xF8008000 + 0x1000 × n) and of `AFI_WRCHAN_CTRL`
   (offset 0x14). UG585 describes them on pages 760 and 764. On 2026-11-26, both read 0 for HP0
   **[measured]**: 64-bit. `ps7_init` of the board preset does not write them. A design with 32-bit
-  data must set the bits before it transfers. That was not tested.
+  data must set the bits before it transfers.
+- **32-bit data.** On 2026-11-26, a test design outside this repository used the 32-bit mode on
+  HP0 at 100 MHz **[measured]**. The design put the data in bits 31:0, with `AxSIZE` 2 and
+  `WSTRB` 0x0F.
+  - Data written by the PS and read by the PL, and the reverse, gave 0 mismatches in 4 Mi words
+    for each direction, with 1-, 2- and 16-beat bursts.
+  - The AFI blocked each 1-beat read until the reads before it were complete, as UG585 Table 5-8
+    (row 6) says. The design reached 4.9 million reads in each second with 16 in progress, and
+    `AFI_RDDEBUG.OutRdCmds` read 1.
+  - With an even number of beats and `AxCACHE[1]` set, the AFI upsized the bursts. 2-beat
+    bursts then reached the transaction rate of 64-bit 2-beat bursts within 6 %. 16-beat bursts
+    reached 381.5 MiB/s, one 32-bit beat in each cycle.
+- **No return to 64-bit data.** On 2026-11-26, the test design wrote with 32-bit data on HP0.
+  Then the PS wrote 0 to `32BitEn`, while no transfer was in progress **[measured]**.
+  - The next 64-bit writes on HP0 stopped after three or four writes. `AFI_WRDEBUG.OutWrCmds`
+    stayed 1, and the whole PS stopped: no console output and no network.
+  - This happened two times in two attempts. `jtag/release.tcl reset` recovered the board each
+    time.
+  - A write of 1 and then 0 to `32BitEn` without 32-bit traffic had no effect. 64-bit reads after
+    the change completed.
+  - UG585 does not say when `32BitEn` can change. The cause is not known (unknowns.md). Thus a
+    design keeps one data width on a port until a reset of the PS.
 - **Addresses.** UG585, Table 4-1 (page 112), gives the HP ports the DDR from 0x0008_0000 to
   0x3FFF_FFFF. Below 0x0004_0000, an HP port reaches the OCM if the OCM is mapped low. From
   0x0004_0000 to 0x0007_FFFF, it reaches nothing. The board has 512 MiB, 0x0000_0000 to 0x1FFF_FFFF. What an HP access above 0x1FFF_FFFF does is not

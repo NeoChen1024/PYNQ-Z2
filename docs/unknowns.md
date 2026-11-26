@@ -33,8 +33,8 @@ question removes it here and updates that document.
 - Whether a transfer between the CPU and the PL fails without `dsb` before the start. The test
   always used `dsb`. (pl-interface.md)
 - What an HP access above 0x1FFF_FFFF does on this board with 512 MiB. (pl-interface.md)
-- Whether an HP port with 32-bit data works after a write to its AFI registers. Not tested.
-  (pl-interface.md)
+- Why 64-bit writes on an HP port stop the PS after 32-bit writes on that port and a write of 0
+  to `32BitEn`. A change of `32BitEn` without 32-bit traffic had no effect. (pl-interface.md)
 
 - How the FIQ from the PL (`IRQF2P[18]`) reaches CPU0 while `ICCICR` is 0x1. UG585 says that the
   pass-through is used only when `ICCICR[1:0]` is 0. (vivado.md)
