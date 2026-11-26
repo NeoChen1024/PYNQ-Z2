@@ -30,8 +30,6 @@ question removes it here and updates that document.
 - Why bit 0 of `FPGA0_THR_CNT` (0xF8000178) stops `FCLK_CLK0`. Linux uses it as the gate of the
   clock, and a write of 1 stopped the clock. UG585 (page 1584) describes the register as the count
   of the clock throttle. (pl-interface.md)
-- Whether a read in the GP0 window stops the PS when no PL design answers it. Not tested, because
-  it can stop the board. (pl-interface.md)
 - Whether a transfer between the CPU and the PL fails without `dsb` before the start. The test
   always used `dsb`. (pl-interface.md)
 - What an HP access above 0x1FFF_FFFF does on this board with 512 MiB. (pl-interface.md)

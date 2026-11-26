@@ -49,7 +49,7 @@
 	/*
 	 * The registers of the PL design on M_AXI_GP0, and IRQF2P[0] (GIC ID 61, SPI 29, level high), for
 	 * uio_pdrv_genirq (uio_pdrv_genirq.of_id=generic-uio on the command line). The driver does not
-	 * read the registers. Without a PL design that answers, a read in this window can stop the PS.
+	 * read the registers. Without a PL design that answers, a read in this window stops the PS.
 	 */
 	pl_uio: pl-uio@40000000 {
 		compatible = "generic-uio";

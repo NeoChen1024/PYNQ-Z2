@@ -16,8 +16,9 @@ configuration, U-Boot and the card image of `linux/` provide it.
 
 ## Version
 
-The git tag `pl-interface-v1` marks the first commit that provides this interface. A change to a
-value of the table above gets a new tag, and this section names it.
+The git tag `pl-interface-v1` marks the commit that defines this interface: this document and the
+files of `linux/` that provide it. A change to a value of the table above gets a new tag, and this
+section names it.
 
 The interface needs the boot files of `linux/` from that commit or later: `BOOT.BIN`, `u-boot.img`,
 `zImage`, `zynq-pynq-z2.dtb` and `extlinux.conf` of `mkdisk.sh`.
@@ -27,8 +28,8 @@ The interface needs the boot files of `linux/` from that commit or later: `BOOT.
 1. The design instantiates the PS7 cell. `IRQF2P[19:16]` stay 0 (vivado.md).
 2. A clock runs on `MAXIGP0ACLK` and on the `SAXIHPnACLK` of each HP port that the design uses.
    `FCLK_CLK0` is the clock of this interface.
-3. The design answers each request in the register window. The window is 1 MiB; the design can
-   repeat its registers in it.
+3. The design answers each request in the register window. A request without an answer stops the
+   PS until a power cycle. The window is 1 MiB; the design can repeat its registers in it.
 4. An HP master of the design accesses only the reserved region. It starts a transfer only on a
    command of the PS.
 5. The interrupt of the design is `IRQF2P[0]`, active high. The line stays high until software
@@ -57,9 +58,22 @@ reaches the PL in program order.
 `M_AXI_GP0` is an AXI3 port with 32-bit data and 12-bit IDs (the ports of the PS7 cell). UG585,
 Table 4-1 (page 112), gives it 0x4000_0000 to 0x7FFF_FFFF. The interface uses the first 1 MiB of it.
 
-A read in the window needs a design that answers it. Without one, the access possibly never ends
-and stops the PS. This was not tested (unknowns.md). Read the registers only when the design is in
-the PL. The UIO driver itself does not access the window.
+A read in the window needs a design that answers it. Without one, the PS stops **[measured]**. On
+2026-11-26, CPU1 read 0x40000000 with `devmem2` in two cases:
+
+| PL | `LVL_SHFTR_EN` | Result |
+|---|---|---|
+| Empty, after a reboot | 0xF | The PS stopped |
+| pl-blinky: a PS7 cell with nothing connected, thus no clock on `MAXIGP0ACLK` | 0xF | The PS stopped |
+
+In both cases, the console and SSH stopped at the time of the read. CPU0 stopped too, not only
+CPU1. Over JTAG, neither core halted, and the debug port reported APB AP transaction errors. Neither
+`jtag/release.tcl reset` nor `rst -system` of xsdb reset the PS. Only a power cycle recovered the
+board.
+
+Thus a program reads the registers only when a design that answers is in the PL and its clock
+runs. `pltest` first checks DONE of the devcfg and the FCLK0 gate. That check does not show that
+the design in the PL is the correct one. The UIO driver itself does not access the window.
 
 ## Interrupt
 

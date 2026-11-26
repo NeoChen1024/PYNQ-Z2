@@ -9,8 +9,8 @@
 //   ./pltest [-n count]            count: the transfers of the short-transfer test (default 10000)
 //
 // The program does not write outside the reserved region and the registers of the design. Without
-// a design that answers, a read of the registers can stop the PS. Thus the program first checks DONE
-// of the devcfg (the PL is configured) and FCLK0 (on in the SLCR).
+// a design that answers, a read of the registers stops the PS until a power cycle. Thus the program
+// first checks DONE of the devcfg (the PL is configured) and FCLK0 (on in the SLCR).
 
 #include <dirent.h>
 #include <fcntl.h>
