@@ -25,10 +25,12 @@ PHY is in reset and `CLK125` stops **[manual]**.
 - The board preset gives MIO9 to the ENET0 reset (`PCW_ENET0_RESET_IO`). Software that resets the
   PHY (the FSBL, U-Boot or Linux) stops `SYSCLK` for the time of the reset.
 - A PL design that uses `SYSCLK` must not depend on it while the PS resets the PHY. If the design
-  needs a clock that never stops, use `FCLK_CLK0` of the PS.
+  needs a clock that never stops, use `FCLK_CLK0` of the PS. Linux keeps `FCLK_CLK0` on only with
+  `fclk-enable` in the device tree; without it, Linux stopped the clock (pl-interface.md).
 - The PHY gives `CLK125` with its default settings **[measured]**. On 2026-11-24, pl-blinky
-  counted on LD0 to LD3 from `SYSCLK`. No software had initialized the PS or the PHY. The frequency
-  was not measured.
+  counted on LD0 to LD3 from `SYSCLK`. No software had initialized the PS or the PHY.
+- `SYSCLK` is 1.25000 times `FCLK_CLK0` **[measured]**. On 2026-11-26, pl-interface counted both
+  for 1 s (pl-interface.md). Both come from OSC3, so this checks the dividers, not OSC3.
 - A register write stops `CLK125`: bit 4 of PHYCR (register 0x10, page 0) is "Disable CLK125"
   (RTL8211E data sheet, Table 37, PDF page 49). On 2026-11-24 **[measured]**, U-Boot read PHYCR as
   0x016E. pinprobe counted the changes of its bit that `SYSCLK` divides by 2^23, for 8 s each:

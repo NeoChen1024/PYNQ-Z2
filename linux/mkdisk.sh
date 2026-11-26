@@ -35,7 +35,7 @@ timeout 3
 label pynq-z2
     kernel /zImage
     fdt /zynq-pynq-z2.dtb
-    append console=ttyPS0,115200 root=/dev/mmcblk0p2 rootfstype=f2fs rootwait rw
+    append console=ttyPS0,115200 root=/dev/mmcblk0p2 rootfstype=f2fs rootwait rw uio_pdrv_genirq.of_id=generic-uio
 CONF
 mcopy -i "$fat" "$uboot/boot.bin" ::BOOT.BIN
 mcopy -i "$fat" "$uboot/u-boot.img" "$linux/zImage" "$linux/zynq-pynq-z2.dtb" ::

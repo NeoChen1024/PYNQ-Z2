@@ -95,10 +95,11 @@ The empty PS7 cell and the `processing_system7` IP tie `IRQF2P` to 0. Thus, with
 FIQ line of CPU0 is active; this agrees with all the tests, but the level of the line was not
 measured directly.
 
-Each design of this repository instantiates `PS7` with nothing connected. A block design with
-`processing_system7` has the cell already. A design that uses the FIQ of a CPU (`Core0_nFIQ`,
-`Core1_nFIQ` of the IP) must keep it inactive while Linux runs. A bitstream that is loaded before
-Linux starts, or in JTAG mode, is not affected.
+pl-blinky and pinprobe instantiate `PS7` with nothing connected. pl-interface connects
+`M_AXI_GP0`, `S_AXI_HP0` and `IRQF2P[0]`, and ties the other `IRQF2P` inputs to 0
+(pl-interface.md). A block design with `processing_system7` has the cell already. A design that
+uses the FIQ of a CPU (`Core0_nFIQ`, `Core1_nFIQ` of the IP) must keep it inactive while Linux
+runs. A bitstream that is loaded before Linux starts, or in JTAG mode, is not affected.
 
 CPU0 read `ICCICR` = 0x1 while Linux ran. By UG585, Figure 7-3 (page 216), the FIQ from the PL then
 goes through the GIC and not directly to the CPU, and with `FIQEn` = 0 the GIC does not signal a

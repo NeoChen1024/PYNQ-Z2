@@ -39,6 +39,7 @@ If no source says something, the text says that it is not known.
 | LEDs, buttons, switches | 4 LEDs, 2 RGB LEDs, 4 buttons, 2 switches on the PL | [docs/leds-buttons-switches.md](docs/leds-buttons-switches.md) |
 | Crypto chip | ATSHA204A on J15, possibly not fitted | [docs/crypto.md](docs/crypto.md) |
 | Vivado | The master XDC, the board files, and the faults of the vendor files | [docs/vivado.md](docs/vivado.md) |
+| PS/PL interface | The fixed interface for PL designs under Linux: GP0 registers through UIO, `IRQF2P[0]`, 16 MiB of DDR for the HP ports, `FCLK_CLK0` at 100 MHz, the PL load | [docs/pl-interface.md](docs/pl-interface.md) |
 | Not known | The open questions | [docs/unknowns.md](docs/unknowns.md) |
 
 Read these points before you use the board:
@@ -67,6 +68,7 @@ Read these points before you use the board:
 | `jtag/release.tcl` | Clears the reset vector catch that `hw_server` sets on the Cortex-A9 cores; the other JTAG scripts call it. With `reset`, it also resets the system |
 | `jtag/boot.sh`, `jtag/boot.tcl` | Boot the PS over JTAG with `xsdb`: `ps7_init`, an optional bitstream, data files and an ELF program |
 | `examples/pl-blinky/` | The smallest PL design: SYSCLK, the switches, the buttons and the LEDs |
+| `examples/pl-interface/` | The test design and test program of the PS/PL interface: registers on GP0, a master on HP0, an interrupt |
 | `tools/ddrscan/` | Measure the write and read data eye of each DDR byte lane over JTAG, from the U-Boot prompt. `eye-2026-11-24.csv` is its result |
 | `tools/bscan/` | Sample the boundary register of the PL over JTAG, also with the PL cleared, and map it to the pins |
 | `tools/pinprobe/` | A JTAG instrument in the PL: reads every PL pin with pull-ups or pull-downs, watches pins, scans the codec I2C bus, drives the HPD of `HDMI_IN`. `census-2026-11-24.csv` is its first result |

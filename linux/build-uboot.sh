@@ -3,8 +3,10 @@
 # the PS initialization of ps7/build.sh. The environment is kept only in uboot.env on the FAT
 # partition of the card, never in the QSPI flash. The FIT images are not signed: the host tools then
 # need no libcrypto (OpenSSL 4 has no ENGINE API, which the signing tools of U-Boot use). U-Boot reads
-# the MAC address from the OTP area of the QSPI flash (patches/u-boot/). The source tree gets the device
-# tree, its line in the Makefile and the patches; the objects go to WORK.
+# the MAC address from the OTP area of the QSPI flash (patches/u-boot/). It loads /pl.bit of the FAT
+# partition into the PL if the file is there, and sets fdtoverlay_addr_r for the fdtoverlays of
+# extlinux.conf. The source tree gets the device tree, its line in the Makefile and the patches; the
+# objects go to WORK.
 #
 #   [WORK=dir] [CROSS_COMPILE=arm-none-eabi-] sh build-uboot.sh /path/to/u-boot /path/to/ps7_init_gpl.c
 #
@@ -46,6 +48,13 @@ for p in "$here"/patches/u-boot/*.patch; do
 done
 
 b="$work/ubuild"
+# preboot runs before the boot (docs/pl-interface.md). An uboot.env with a preboot variable takes
+# precedence over this default.
+# - The default environment of Zynq has no fdtoverlay_addr_r, and extlinux.conf then ignores its
+#   fdtoverlays line. 0x1e00000 is 1 MiB below fdt_addr_r (0x1f00000).
+# - U-Boot loads pl.bit from the FAT partition into the PL, if the file is there.
+# No "&&": scripts/config gives the value to sed, which reads "&" as the matched text.
+preboot='env exists fdtoverlay_addr_r || setenv fdtoverlay_addr_r 0x1e00000; if test -e mmc 0:1 /pl.bit; then echo Loading /pl.bit into the PL; if load mmc 0:1 ${kernel_addr_r} /pl.bit; then fpga loadb 0 ${kernel_addr_r} ${filesize}; fi; fi'
 mk() { make -C "$src" O="$b" -j"$(nproc)" "$@"; }
 mk xilinx_zynq_virt_defconfig >/dev/null
 "$src/scripts/config" --file "$b/.config" \
@@ -61,9 +70,14 @@ mk xilinx_zynq_virt_defconfig >/dev/null
     --disable SPL_FIT_SIGNATURE \
     --disable TOOLS_KWBIMAGE \
     --disable TOOLS_LIBCRYPTO \
-    --enable ZYNQ_QSPI_OTP_MAC
+    --enable ZYNQ_QSPI_OTP_MAC \
+    --enable OF_LIBFDT_OVERLAY \
+    --enable USE_PREBOOT \
+    --set-str PREBOOT "$preboot"
 mk olddefconfig >/dev/null
 grep -q '^CONFIG_ZYNQ_QSPI_OTP_MAC=y' "$b/.config" || { echo "ZYNQ_QSPI_OTP_MAC is not set" >&2; exit 1; }
+grep -q '^CONFIG_OF_LIBFDT_OVERLAY=y' "$b/.config" || { echo "OF_LIBFDT_OVERLAY is not set" >&2; exit 1; }
+grep -qxF "CONFIG_PREBOOT=\"$preboot\"" "$b/.config" || { echo "PREBOOT is not set" >&2; exit 1; }
 grep -q '^CONFIG_ENV_IS_IN_SPI_FLASH=y' "$b/.config" && { echo "the environment is still in the QSPI flash" >&2; exit 1; }
 mk >"$work/build.log" 2>&1 || { tail -20 "$work/build.log" >&2; exit 1; }
 cp "$b/spl/boot.bin" "$b/u-boot.img" "$b/u-boot.elf" "$work/"

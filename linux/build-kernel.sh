@@ -19,6 +19,8 @@ dts="$src/arch/arm/boot/dts/xilinx"
 install -m 644 "$here/zynq-pynq-z2.dts" "$dts/zynq-pynq-z2.dts"
 grep -q 'zynq-pynq-z2.dtb' "$dts/Makefile" || sed -i 's/^\(\s*\)zynq-zybo-z7.dtb/\1zynq-pynq-z2.dtb \\\n\1zynq-zybo-z7.dtb/' "$dts/Makefile"
 grep -q 'zynq-pynq-z2.dtb' "$dts/Makefile" || { echo "could not add the dtb to $dts/Makefile" >&2; exit 1; }
+# -@ keeps the labels in the dtb, so that an overlay of fdtoverlays can refer to them (docs/pl-interface.md).
+grep -q '^DTC_FLAGS_zynq-pynq-z2' "$dts/Makefile" || echo 'DTC_FLAGS_zynq-pynq-z2 := -@' >>"$dts/Makefile"
 
 # A patch that reverses cleanly is in the tree already.
 for p in "$here"/patches/linux/*.patch; do

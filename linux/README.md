@@ -35,7 +35,7 @@ the Makefile of the device trees to each source tree. `build-kernel.sh` applies 
 
 | File | Contents |
 |---|---|
-| `zynq-pynq-z2.dts` | The device tree of the board, for U-Boot and Linux: UART0, GEM0 with the PHY at MDIO address 1, SDIO0, USB0 as host, the QSPI flash (read-only), the HDMI output DDC on MIO50/51 |
+| `zynq-pynq-z2.dts` | The device tree of the board, for U-Boot and Linux: UART0, GEM0 with the PHY at MDIO address 1, SDIO0, USB0 as host, the QSPI flash (read-only), the HDMI output DDC on MIO50/51, and the PS/PL interface (docs/pl-interface.md) |
 | `pynq-z2.config` | The kernel configuration fragment, on top of `multi_v7_defconfig` |
 | `patches/linux/`, `patches/u-boot/` | Patches to Linux and to U-Boot, applied by the build scripts (GPL-2.0, as Linux and U-Boot) |
 | `build-kernel.sh` | Builds `zImage`, the device tree and the modules with clang (`LLVM=1`) |
@@ -69,7 +69,10 @@ without a card in the boot path.
 - U-Boot keeps its environment in `uboot.env` on the FAT partition. It never writes the QSPI flash.
   The FIT images are not signed.
 - U-Boot reads `extlinux/extlinux.conf` from the FAT partition. The kernel command line has
-  `console=ttyPS0,115200 root=/dev/mmcblk0p2 rootfstype=f2fs`.
+  `console=ttyPS0,115200 root=/dev/mmcblk0p2 rootfstype=f2fs` and
+  `uio_pdrv_genirq.of_id=generic-uio`.
+- Before the boot, U-Boot loads `/pl.bit` of the FAT partition into the PL, if the file is there.
+  It also sets `fdtoverlay_addr_r`, so that the `fdtoverlays` line of `extlinux.conf` works.
 - U-Boot reads the MAC address from the OTP area of the QSPI flash, offset 0x20 (docs/boot.md),
   and gives it to Linux in the device tree. `patches/u-boot/` adds this (`CONFIG_ZYNQ_QSPI_OTP_MAC`).
   It only reads the OTP area. An `ethaddr` in `uboot.env` takes precedence. If the OTP area has no
@@ -83,6 +86,18 @@ without a card in the boot path.
   QEMU on 2026-11-23).
 - `i2c-gpio` (the HDMI output DDC) is a module. If SCL stays low, its probe waits for about 18 s; in
   QEMU it held the boot for that time while it was built in.
+
+## PS/PL interface
+
+[docs/pl-interface.md](../docs/pl-interface.md) defines the interface between Linux and a PL design.
+These files provide it:
+
+- `zynq-pynq-z2.dts`: the reserved region at 0x1F000000 (16 MiB, `no-map`), the UIO node of the GP0
+  window and `IRQF2P[0]`, and `fclk-enable` for `FCLK_CLK0`.
+- `pynq-z2.config`: UIO and `uio_pdrv_genirq` built in.
+- `build-kernel.sh`: the dtb keeps its labels (`-@`) for overlays.
+- `build-uboot.sh`: the `preboot` that loads `/pl.bit` and sets `fdtoverlay_addr_r`.
+- `mkdisk.sh`: the UIO option on the kernel command line.
 
 ## USB host
 

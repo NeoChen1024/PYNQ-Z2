@@ -31,6 +31,34 @@
 		reg = <0x0 0x20000000>;
 	};
 
+	/*
+	 * The PS/PL interface of docs/pl-interface.md. A PL master on an S_AXI_HP port uses this region;
+	 * user space maps it through /dev/mem with O_SYNC. With no-map, the kernel neither uses nor maps it.
+	 */
+	reserved-memory {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+
+		pl_buffer: pl-buffer@1f000000 {
+			reg = <0x1f000000 0x01000000>;
+			no-map;
+		};
+	};
+
+	/*
+	 * The registers of the PL design on M_AXI_GP0, and IRQF2P[0] (GIC ID 61, SPI 29, level high), for
+	 * uio_pdrv_genirq (uio_pdrv_genirq.of_id=generic-uio on the command line). The driver does not
+	 * read the registers. Without a PL design that answers, a read in this window can stop the PS.
+	 */
+	pl_uio: pl-uio@40000000 {
+		compatible = "generic-uio";
+		reg = <0x40000000 0x00100000>;
+		interrupt-parent = <&intc>;
+		interrupts = <0 29 4>;
+		linux,uio-name = "pl";
+	};
+
 	/* The ULPI PHY U9; MIO46 is its RESETB (docs/usb.md). */
 	usb_phy0: phy0 {
 		compatible = "usb-nop-xceiv";
@@ -68,6 +96,11 @@
 
 &clkc {
 	ps-clk-frequency = <50000000>;	/* OSC3 (docs/clocks.md) */
+	/*
+	 * FCLK0 stays on for the PL (docs/pl-interface.md). zynq-7000.dtsi has 0: then the kernel turns the
+	 * FCLKs off at the end of the boot, because no driver uses them.
+	 */
+	fclk-enable = <0x1>;
 };
 
 /*

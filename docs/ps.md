@@ -210,7 +210,7 @@ not read the boot straps again. The PROG1 button resets only the PL (boot.md).
 |---|---|---|
 | CPU | 650 MHz | `PCW_APU_PERIPHERAL_FREQMHZ`, ratio 6:2:1 |
 | DDR | 525 MHz | `PCW_UIPARAM_DDR_FREQ_MHZ` |
-| `FCLK_CLK0` (PL) | 100 MHz | `PCW_FPGA0_PERIPHERAL_FREQMHZ`; `FCLK_CLK1` to `3` are off |
+| `FCLK_CLK0` (PL) | 100 MHz | `PCW_FPGA0_PERIPHERAL_FREQMHZ`; `FCLK_CLK1` to `3` are off. Linux keeps `FCLK_CLK0` on (pl-interface.md) |
 | QSPI | 200 MHz (controller reference) | `PCW_QSPI_PERIPHERAL_FREQMHZ` |
 | SDIO | 50 MHz | `PCW_SDIO_PERIPHERAL_FREQMHZ` |
 | UART | 100 MHz reference, 115200 baud | `PCW_UART_PERIPHERAL_FREQMHZ` |
