@@ -24,7 +24,7 @@ Before the board, the system booted in QEMU (`qemu.sh`, QEMU machine `xilinx-zyn
 | Part | Version | Source |
 |---|---|---|
 | U-Boot | v2026.10 | <https://source.denx.de/u-boot/u-boot.git>, tag `v2026.10` |
-| Linux | 6.18.64 (longterm) | <https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.18.64.tar.xz> |
+| Linux | 6.18.65 (longterm) | <https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.18.65.tar.xz> |
 | Alpine Linux | 3.24.4, armv7 | The `alpine:3.24.4` container and <https://dl-cdn.alpinelinux.org/alpine/v3.24/> |
 
 The sources stay outside the repository. The build scripts add `zynq-pynq-z2.dts` and its line in
@@ -56,7 +56,7 @@ cd /some/writable/directory
 
 sh $P/ps7/build.sh                                        # ./pynq-ps7: ps7_init_gpl.c, ps7_init.tcl
 sh $P/linux/build-uboot.sh /path/to/u-boot pynq-ps7/ps7_init_gpl.c     # ./pynq-uboot
-sh $P/linux/build-kernel.sh /path/to/linux-6.18.64                     # ./pynq-linux
+sh $P/linux/build-kernel.sh /path/to/linux-6.18.65                     # ./pynq-linux
 sh $P/linux/mkrootfs.sh /path/to/key.pub pynq-linux/modules            # ./pynq-rootfs/rootfs.f2fs
 sh $P/linux/mkdisk.sh pynq-uboot pynq-linux pynq-rootfs/rootfs.f2fs    # ./pynq-disk/pynq-z2.img
 ```
