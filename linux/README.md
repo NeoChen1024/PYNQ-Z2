@@ -84,6 +84,8 @@ without a card in the boot path.
   ARM PLL of the board preset. With the 666667 kHz of `zynq-7000.dtsi`, the start frequency is not in
   the table; cpufreq-dt then tries to change it, fails, and stops the kernel at a `BUG_ON` (seen in
   QEMU on 2026-11-23).
+- The default cpufreq governor is `performance`: the CPU stays at 650 MHz. The two operating points
+  have the same voltage. The governor `ondemand` can select 325 MHz.
 - `i2c-gpio` (the HDMI output DDC) is a module. If SCL stays low, its probe waits for about 18 s; in
   QEMU it held the boot for that time while it was built in.
 

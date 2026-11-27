@@ -106,7 +106,7 @@ minute: 474 minutes. The lowest values were 1.006 V (`VCCINT`), 1.772 V (`VCCAUX
 
 The owner read an inline USB meter on J8, with J9 on `USB` (2026-11-25) **[measured]**. The PL was
 not configured, Ethernet had a 1 Gb/s link, and no USB device was connected. Linux ran
-`linux/README.md`, with the CPU at 650 MHz or 325 MHz (`schedutil`).
+`linux/README.md`, with the CPU at 650 MHz or 325 MHz (`ondemand`).
 
 | Load | Current at J8 | Voltage at J8 |
 |---|---|---|
